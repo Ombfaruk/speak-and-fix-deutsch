@@ -1,0 +1,30 @@
+{
+  "background_color": "#eef2f4",
+  "description": "Deutsch sprechen üben mit Grammatik-Coach. Goethe A1.",
+  "display": "standalone",
+  "icons": [
+    {
+      "sizes": "192x192",
+      "src": "icon-192.png",
+      "type": "image/png"
+    },
+    {
+      "sizes": "512x512",
+      "src": "icon-512.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "512x512",
+      "src": "icon-512.png",
+      "type": "image/png"
+    }
+  ],
+  "lang": "de",
+  "name": "Sprich & Fix - Deutsch Sprechen",
+  "orientation": "portrait",
+  "scope": "/speak-and-fix-deutsch/",
+  "short_name": "Sprich & Fix",
+  "start_url": "/speak-and-fix-deutsch/",
+  "theme_color": "#0b7a75"
+}

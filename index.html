@@ -1,0 +1,1597 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sprich &amp; Fix</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0b7a75">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Hind+Siliguri:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#eef2f4; --panel:#ffffff; --fg:#14202b; --muted:#5b6b78; --line:#d9e1e6;
+  --accent:#0b7a75; --accent-fg:#ffffff; --coach:#9a4b00; --coach-bg:#fff4e6;
+  --bad:#c0362c; --bad-bg:#fde8e5; --good:#18794e; --good-bg:#e4f5ec;
+  --me:#e3f1ef; --ai:#f1f4f6;
+  --f-display:"Bricolage Grotesque","Hind Siliguri",system-ui,sans-serif;
+  --f-body:"Hind Siliguri",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1418; --panel:#162027; --fg:#e6edf2; --muted:#93a4b1; --line:#26343d;
+    --accent:#3cc4bb; --accent-fg:#06231f; --coach:#ffb25e; --coach-bg:#2b2012;
+    --bad:#ff8a7a; --bad-bg:#3a1c19; --good:#5fd79b; --good-bg:#12301f;
+    --me:#17383a; --ai:#1d2a32; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1418; --panel:#162027; --fg:#e6edf2; --muted:#93a4b1; --line:#26343d;
+  --accent:#3cc4bb; --accent-fg:#06231f; --coach:#ffb25e; --coach-bg:#2b2012;
+  --bad:#ff8a7a; --bad-bg:#3a1c19; --good:#5fd79b; --good-bg:#12301f;
+  --me:#17383a; --ai:#1d2a32; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--f-body);
+  padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px));
+  padding-block:12px}
+.app{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:12px;min-height:100%}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+h1{font:700 22px/1.1 var(--f-display);margin:0;letter-spacing:-.01em}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button,select,input{font:inherit;color:inherit}
+.btn{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+.expandBtn{background:transparent;border:1px solid var(--line);border-radius:999px;padding:4px 14px;margin:0 0 8px;cursor:pointer;font-size:13px;color:var(--muted)}
+.expandBtn:hover{color:var(--fg)}
+.btn:hover{border-color:var(--accent)}
+.btn.tab[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+header{position:relative}
+#menuBtn{font-size:18px;line-height:1;padding:6px 14px}
+.menu{position:absolute;top:calc(100% + 6px);right:0;min-width:220px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 8px 28px rgba(0,0,0,.25);z-index:50;display:flex;flex-direction:column;gap:2px}
+.menu-item{background:transparent;border:0;border-radius:8px;padding:10px 12px;text-align:left;cursor:pointer;font-size:15px;color:var(--fg)}
+.menu-item:hover{background:var(--line)}
+.menu-item.active{color:var(--accent);font-weight:700}
+.menu-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;font-size:15px;border-top:1px solid var(--line)}
+.menu-row .btn{padding:4px 12px;font-size:14px}
+.btn.danger{color:var(--bad)}
+.btn:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible,.mic:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+details.settings{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+details.settings summary{cursor:pointer;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px 14px;margin-top:12px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);min-width:0}
+label.f input,label.f select{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;color:var(--fg);min-width:0;width:100%}
+.hint{font-size:12.5px;color:var(--muted);margin:8px 0 0}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;min-height:0}
+@media (max-width:760px){.panels{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;min-width:0;min-height:340px;max-height:calc(100vh - 150px)}
+@media (max-width:760px){.panel{max-height:none;min-height:300px}}
+.ph{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ph h2{font:600 16px/1.2 var(--f-display);margin:0}
+.ph small{color:var(--muted)}
+.feed{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-height:0}
+.empty{color:var(--muted);margin:auto;text-align:center;max-width:30ch}
+.msg{max-width:88%;padding:8px 12px;border-radius:12px;overflow-wrap:anywhere}
+.msg.me{align-self:flex-end;background:var(--me);border-bottom-right-radius:4px}
+.msg.ai{align-self:flex-start;background:var(--ai);border-bottom-left-radius:4px}
+.msg .who{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.msg.live{opacity:.75}
+.ctl{padding:12px 14px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;
+  padding-bottom:max(12px,env(safe-area-inset-bottom,0px))}
+.mic{border:0;border-radius:999px;background:var(--accent);color:var(--accent-fg);font-weight:600;padding:11px 20px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;position:relative;--mic-level:0;transition:box-shadow .2s ease,transform .12s ease-out,background-color .25s ease}
+.mic[aria-pressed="true"]{background:var(--bad);color:#fff}
+.mic.live{box-shadow:0 0 calc(10px + var(--mic-level)*30px) calc(2px + var(--mic-level)*7px) var(--accent);transform:scale(calc(1 + var(--mic-level)*0.05))}
+.mic.live::before{content:"";position:absolute;inset:-5px;border-radius:999px;border:calc(1px + var(--mic-level)*2px) solid var(--accent);opacity:calc(0.3 + var(--mic-level)*0.7);pointer-events:none;transition:opacity .12s ease-out}
+.dot{width:9px;height:9px;border-radius:50%;background:currentColor;opacity:.9;transition:transform .12s ease-out}
+.mic.live .dot{transform:scale(calc(1 + var(--mic-level)*0.9))}
+@media (prefers-reduced-motion:reduce){.mic.live{transform:none}}
+.status{font-size:13px;color:var(--muted);flex:1;min-width:140px}
+.status.err{color:var(--bad)}
+.card{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;background:var(--panel)}
+.card .orig{overflow-wrap:anywhere}
+mark{background:var(--bad-bg);color:var(--bad);border-radius:3px;padding:0 2px;font-weight:600}
+.fix{background:var(--good-bg);color:var(--good);border-radius:8px;padding:6px 10px;font-weight:500;overflow-wrap:anywhere}
+.why{color:var(--fg)}
+.nat{color:var(--coach);background:var(--coach-bg);border-radius:8px;padding:6px 10px;font-size:14px;overflow-wrap:anywhere}
+.perfect{color:var(--good);font-weight:600}
+.pending{color:var(--muted);font-style:italic}
+.tag{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:1px 9px;color:var(--muted)}
+.chip.bad{color:var(--bad);border-color:var(--bad)}
+.notice{background:var(--coach-bg);color:var(--coach);border-radius:8px;padding:8px 12px;font-size:13.5px}
+.report{border:1px solid var(--accent);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--panel)}
+.report h4,.prog h3{font:600 15px/1.3 var(--f-display);margin:0}
+.bands{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:8px}
+.band{border:1px solid var(--line);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;gap:2px}
+.band b{font:700 22px/1 var(--f-display)}
+.band span{font-size:12px;color:var(--muted)}
+.band.main{border-color:var(--accent)}
+.report ul,.prog ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px}
+.prog{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:18px}
+.prog section{display:flex;flex-direction:column;gap:8px;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.bars{display:flex;flex-direction:column;gap:6px}
+.brow{display:grid;grid-template-columns:minmax(110px,170px) 1fr 34px;gap:8px;align-items:center;font-size:14px}
+.btrack{height:10px;background:var(--bg);border-radius:6px;overflow:hidden}
+.bfill{height:100%;background:var(--bad);border-radius:6px}
+.bfill.ok{background:var(--accent)}
+.num{font-variant-numeric:tabular-nums;text-align:right}
+.rec{display:flex;gap:8px;flex-wrap:wrap;align-items:baseline;overflow-wrap:anywhere}
+.rec s{color:var(--bad)} .rec em{color:var(--good);font-style:normal;font-weight:500}
+.sess{border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.sess summary{cursor:pointer;display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between}
+.sess .body{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.plan{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--bg);border-radius:8px;padding:10px 12px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.goal{display:grid;grid-template-columns:auto minmax(60px,1fr) auto;gap:10px;align-items:center;font-size:13.5px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.subbody{display:flex;flex-direction:column;gap:18px;min-width:0}
+.dayhead{display:flex;gap:6px 12px;flex-wrap:wrap;align-items:center}
+.li2{display:flex;flex-direction:column;gap:2px;padding:6px 0;border-top:1px solid var(--line)}
+.li2:first-child{border-top:0}
+.ctx{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+ul.plain{list-style:none;padding:0;margin:0}
+.flash{border:1px solid var(--accent);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;max-width:640px}
+.flash .big{font-size:18px;overflow-wrap:anywhere}
+.small{font-size:13px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1 id="t-title">Sprich &amp; Fix</h1>
+    <div class="bar">
+      <button class="btn" id="menuBtn" type="button" aria-label="Menu" aria-expanded="false">☰</button>
+    </div>
+    <nav class="menu" id="menu" hidden>
+      <button class="menu-item active" id="mPractice" type="button" data-bn="অনুশীলন" data-de="Üben">Practice</button>
+      <button class="menu-item" id="mProgress" type="button" data-bn="অগ্রগতি" data-de="Fortschritt">Progress</button>
+      <button class="menu-item" id="mSettings" type="button" data-bn="সেটিংস" data-de="Einstellungen">Settings</button>
+      <div class="menu-row">
+        <span data-bn="ভাষা" data-de="Sprache">Language</span>
+        <button class="btn" id="langBtn" type="button">Deutsch</button>
+      </div>
+      <div class="menu-row">
+        <span data-bn="থিম" data-de="Design">Theme</span>
+        <button class="btn" id="themeBtn" type="button" aria-label="Theme">◐</button>
+      </div>
+    </nav>
+  </header>
+
+  <div id="viewPractice" style="display:flex;flex-direction:column;gap:12px;flex:1;min-height:0">
+    <div class="goal" id="goalBar"></div>
+    <details class="settings" id="settings">
+      <summary id="t-settings">Settings</summary>
+      <div class="grid">
+        <label class="f" for="apiKey"><span id="t-key">Gemini API key</span>
+          <input id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="AIza...">
+        </label>
+        <label class="f" for="apiKey2"><span data-bn="কোচের জন্য আলাদা API key (ঐচ্ছিক, ফাঁকা থাকলে উপরের key)" data-de="Separater Coach-API-Key (optional, leer = gleicher Key)">Separate coach API key</span>
+          <input id="apiKey2" type="password" autocomplete="off" spellcheck="false" placeholder="AIza...">
+        </label>
+        <label class="f" for="backupSecret"><span data-bn="ব্যাকআপ সিক্রেট (ঐচ্ছিক, দিলে সেশন শেষে অটো ব্যাকআপ যাবে)" data-de="Backup-Secret (optional, bei Angabe automatisches Backup nach der Sitzung)">Backup secret</span>
+          <input id="backupSecret" type="password" autocomplete="off" spellcheck="false" placeholder="••••••••">
+        </label>
+        <label class="f" for="modelKind"><span id="t-voicemodel">Voice model</span>
+          <select id="modelKind">
+            <option value="audio" data-bn="রেকর্ড মোড (Gemini আপনার কণ্ঠ শুনে উচ্চারণসহ কোচিং দেয়)" data-de="Sprachaufnahme (Gemini hört dich und coacht auch die Aussprache)">Voice recording</option>
+            <option value="standard" id="o-std">Standard Live (longer sessions)</option>
+            <option value="native" id="o-nat">Native audio (most natural)</option>
+            <option value="browser" data-bn="Chrome ভয়েস (ফ্রি, প্রতি বাক্যে ১টি রিকোয়েস্ট)" data-de="Chrome-Stimme (kostenlos, 1 Anfrage pro Runde)">Chrome voice (free, 1 request per turn)</option>
+          </select>
+        </label>
+        <label class="f" for="voice"><span id="t-voice">Voice</span>
+          <select id="voice">
+            <option>Puck</option><option>Zephyr</option><option>Kore</option><option>Charon</option>
+            <option>Aoede</option><option>Fenrir</option><option>Leda</option><option>Orus</option>
+          </select>
+        </label>
+        <label class="f" for="level"><span id="t-level">Level</span>
+          <select id="level">
+            <option value="A1" selected>A1 (একদম নতুন)</option>
+            <option value="A2">A2 (একটু জানি)</option>
+            <option value="B1">B1 (মোটামুটি পারি)</option>
+          </select>
+        </label>
+        <label class="f" for="topic"><span id="t-topic">Topic</span>
+          <select id="topic">
+            <option value="sich vorstellen" selected>Sich vorstellen (নিজের পরিচয়)</option>
+            <option value="Alltag und Familie">Alltag und Familie (দৈনন্দিন জীবন ও পরিবার)</option>
+            <option value="Wohnen">Wohnen (বাড়ি ও থাকা)</option>
+            <option value="Essen und Trinken">Essen und Trinken (খাবার ও পানীয়)</option>
+            <option value="Freizeit und Hobbys">Freizeit und Hobbys (অবসর ও শখ)</option>
+            <option value="Einkaufen">Einkaufen (কেনাকাটা)</option>
+            <option value="Arbeit und Studium">Arbeit und Studium (কাজ ও পড়াশোনা)</option>
+            <option value="Reisen und Wetter">Reisen und Wetter (ভ্রমণ ও আবহাওয়া)</option>
+            <option value="freie Wahl">Freie Wahl (নিজের পছন্দ)</option>
+          </select>
+        </label>
+        <label class="f" for="focus"><span data-bn="আমার দুর্বল জায়গা নিয়ে অনুশীলন" data-de="Meine Schwachstellen üben">Practise my weak areas</span>
+          <select id="focus">
+            <option value="1" data-bn="চালু" data-de="Ein">On</option>
+            <option value="0" data-bn="বন্ধ" data-de="Aus">Off</option>
+          </select>
+        </label>
+        <label class="f" for="goal"><span data-bn="প্রতিদিনের লক্ষ্য (বাক্য)" data-de="Tagesziel (Sätze)">Daily goal (sentences)</span>
+          <select id="goal"><option value="10">10</option><option value="15" selected>15</option><option value="20">20</option><option value="30">30</option><option value="50">50</option></select>
+        </label>
+        <label class="f" for="fallback"><span id="t-fallback">If native audio runs out</span>
+          <select id="fallback">
+            <option value="1" id="o-fb1">Switch to standard</option>
+            <option value="0" id="o-fb0">Stop and tell me</option>
+          </select>
+        </label>
+      </div>
+      <details style="margin-top:12px" open>
+        <summary id="t-adv">Model names (change if Google renames them)</summary>
+        <div class="grid">
+          <label class="f" for="mStd"><span data-bn="স্ট্যান্ডার্ড Live মডেল" data-de="Standard-Live-Modell">Standard Live model</span>
+            <select id="mStd"></select><input id="mStdC" spellcheck="false" placeholder="Modellname" hidden></label>
+          <label class="f" for="mNat"><span data-bn="নেটিভ অডিও মডেল" data-de="Natives Audiomodell">Native audio model</span>
+            <select id="mNat"></select><input id="mNatC" spellcheck="false" placeholder="Modellname" hidden></label>
+          <label class="f" for="mGram"><span data-bn="গ্রামার কোচ ও রিপোর্ট মডেল" data-de="Grammatik-Coach- und Berichtsmodell">Grammar coach and report model</span>
+            <select id="mGram"></select><input id="mGramC" spellcheck="false" placeholder="Modellname" hidden></label>
+        </div>
+      </details>
+      <p class="hint" id="t-hint">Your key is stored only in this browser. Use headphones so the mic does not hear the voice.</p>
+    </details>
+
+    <div class="notice" id="notice" hidden></div>
+
+    <main class="panels">
+      <section class="panel" aria-labelledby="h-conv">
+        <div class="ph"><h2 id="h-conv">Conversation</h2><small id="timer">00:00</small></div>
+        <button class="expandBtn" id="convExpand" type="button" hidden></button>
+        <div class="feed" id="convFeed" aria-live="polite"><p class="empty" id="convEmpty">Press the mic and start talking.</p></div>
+        <div class="ctl">
+          <button class="mic" id="micBtn" type="button" aria-pressed="false"><span class="dot"></span><span id="micLabel">Start talking</span></button>
+          <button class="btn" id="endBtn" type="button" hidden data-bn="সেশন শেষ" data-de="Sitzung beenden">End session</button>
+          <button class="btn danger" id="stopRecBtn" type="button" hidden data-bn="⏹ থামুন" data-de="⏹ Stopp">⏹ Stop</button>
+          <span class="status" id="status"></span>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="h-coach">
+        <div class="ph"><h2 id="h-coach">Grammar coach</h2><small id="t-listening">Listening quietly</small></div>
+        <button class="expandBtn" id="coachExpand" type="button" hidden></button>
+        <div class="feed" id="coachFeed" aria-live="polite"><p class="empty" id="coachEmpty">Each sentence you say is checked here.</p></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="viewProgress" hidden>
+    <div class="prog" id="progBody"></div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="exportBtn" type="button" data-bn="হিস্ট্রি ডাউনলোড (backup)" data-de="Verlauf herunterladen (Backup)">Download history</button>
+      <button class="btn" id="importBtn" type="button" data-bn="Backup থেকে ফিরিয়ে আনুন" data-de="Aus Backup wiederherstellen">Restore</button>
+      <input id="importFile" type="file" accept="application/json,.json" hidden>
+      <button class="btn danger" id="clearBtn" type="button" data-bn="সব হিস্ট্রি মুছুন" data-de="Gesamten Verlauf löschen">Delete all history</button>
+    </div>
+    <p class="hint" id="dataMsg"></p>
+    <p class="hint" data-bn="হিস্ট্রি এই ব্রাউজারেই সেভ থাকে। অন্য ফোন বা ব্রাউজারে নিতে হলে ডাউনলোড করে সেখানে ফিরিয়ে আনুন। ব্রাউজারের ডেটা মুছলে হিস্ট্রিও মুছে যাবে।" data-de="Der Verlauf wird nur in diesem Browser gespeichert. Um ihn auf ein anderes Handy oder einen anderen Browser zu übertragen, lade ihn herunter und stelle ihn dort wieder her. Wenn du die Browserdaten löschst, wird auch der Verlauf gelöscht.">History is saved in this browser only.</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ---------- strings ---------- */
+const I18N = {
+  bn: {
+    title:"Sprich & Fix", settings:"সেটিংস", key:"Gemini API key", voicemodel:"ভয়েস মডেল", voice:"ভয়েস",
+    level:"লেভেল", topic:"বিষয়", fallback:"নেটিভ অডিওর লিমিট শেষ হলে", adv:"মডেল বাছাই",
+    hint:"আপনার key শুধু এই ব্রাউজারে থাকে। হেডফোন ব্যবহার করুন, নইলে মাইক Gemini-র কথাও শুনে ফেলবে।",
+    std:"স্ট্যান্ডার্ড Live (বেশি সময় চলে)", nat:"নেটিভ অডিও (সবচেয়ে স্বাভাবিক)", fb1:"স্ট্যান্ডার্ডে চলে যাও", fb0:"থামো এবং জানাও",
+    conv:"কথোপকথন", coach:"গ্রামার কোচ", listening:"চুপচাপ শুনছে",
+    convEmpty:"মাইক চাপুন আর জার্মান ভাষায় কথা বলা শুরু করুন।", coachEmpty:"আপনার প্রতিটি বাক্য এখানে পরীক্ষা হবে।",
+    start:"কথা শুরু", stop:"থামান", connecting:"সংযোগ হচ্ছে…", live:"শুনছি। কথা বলুন।",
+    you:"আপনি", gemini:"Gemini", perfect:"👍 একদম ঠিক আছে!", fixed:"ঠিক বাক্য", natural:"আরও স্বাভাবিক", checking:"পরীক্ষা হচ্ছে…",
+    nokey:"আগে সেটিংসে Gemini API key দিন।", nomic:"মাইক ব্যবহারের অনুমতি পাওয়া যায়নি।", reconnecting:"আবার সংযোগ হচ্ছে…",
+    fellback:"নেটিভ অডিও চলছে না। স্ট্যান্ডার্ড মডেলে চলে গেছি।", failed:"সংযোগ ব্যর্থ", gramfail:"গ্রামার হয়নি",
+    langBtn:"Deutsch", themeDark:"ডার্ক", themeLight:"লাইট", micStart:"কথা শুরু", micStop:"থামান"
+  },
+  de: {
+    title:"Sprich & Fix", settings:"Einstellungen", key:"Gemini API key", voicemodel:"Stimmenmodell", voice:"Stimme",
+    level:"Niveau", topic:"Thema", fallback:"Wenn natives Audio ausgeht", adv:"Modelle wählen",
+    hint:"Dein Key bleibt nur in diesem Browser. Benutze Kopfhörer, damit das Mikrofon die Stimme nicht hört.",
+    std:"Standard Live (längere Sitzungen)", nat:"Natives Audio (am natürlichsten)", fb1:"Zu Standard wechseln", fb0:"Anhalten und Bescheid sagen",
+    conv:"Gespräch", coach:"Grammatik-Coach", listening:"Hört leise zu",
+    convEmpty:"Tippe auf das Mikrofon und fang an, Deutsch zu sprechen.", coachEmpty:"Jeder Satz, den du sagst, wird hier geprüft.",
+    start:"Sprechen starten", stop:"Stopp", connecting:"Verbinden…", live:"Ich höre zu. Sprich.",
+    you:"Du", gemini:"Gemini", perfect:"👍 Genau richtig!", fixed:"Korrigiert", natural:"Natürlicher", checking:"Wird geprüft…",
+    nokey:"Gib zuerst deinen Gemini API key in den Einstellungen ein.", nomic:"Mikrofonzugriff wurde verweigert.", reconnecting:"Erneut verbinden…",
+    fellback:"Natives Audio ist gerade nicht verfügbar. Zum Standardmodell gewechselt.", failed:"Verbindung fehlgeschlagen", gramfail:"Grammatikprüfung fehlgeschlagen",
+    langBtn:"বাংলা", themeDark:"Dunkel", themeLight:"Hell", micStart:"Sprechen starten", micStop:"Stopp"
+  }
+};
+const CAT = {
+  article:["Artikel (der/die/das)","Artikel (der/die/das)"], conjugation:["ক্রিয়ার রূপ","Verbkonjugation"],
+  word_order:["শব্দের ক্রম","Wortstellung"], case:["কারক (Kasus)","Kasus"],
+  negation:["না-বোধক (nicht/kein)","Verneinung (nicht/kein)"], plural:["বহুবচন","Plural"],
+  preposition:["Preposition","Präpositionen"], word_choice:["শব্দ নির্বাচন","Wortwahl"],
+  structure:["বাক্যের গঠন","Satzbau"], other:["অন্যান্য","Sonstiges"]
+};
+const CAT_IDS = Object.keys(CAT);
+
+/* ---------- settings ---------- */
+const $ = id => document.getElementById(id);
+const DEFAULTS = {
+  apiKey:"", apiKey2:"", backupSecret:"", modelKind:"audio", voice:"Puck", level:"A1", topic:"sich vorstellen", fallback:"1", focus:"1", goal:"15",
+  mStd:"gemini-3.8-live", mNat:"gemini-3.1-flash-live-preview", mGram:"gemini-3.8-flash",
+  ui:"bn", theme:""
+};
+let cfg = Object.assign({}, DEFAULTS);
+try { Object.assign(cfg, JSON.parse(localStorage.getItem("sprichfix") || "{}")); } catch(e){}
+if (cfg.mStd === "gemini-live-2.5-flash-preview") cfg.mStd = DEFAULTS.mStd;
+if (cfg.mNat === "gemini-2.5-flash-native-audio-preview-09-2025") cfg.mNat = DEFAULTS.mNat;
+if (cfg.mGram === "gemini-2.5-flash") cfg.mGram = DEFAULTS.mGram;
+function saveCfg(){ try { localStorage.setItem("sprichfix", JSON.stringify(cfg)); } catch(e){} }
+
+["apiKey","apiKey2","backupSecret","modelKind","voice","level","topic","fallback","focus","goal"].forEach(k => {
+  const el = $(k); el.value = cfg[k];
+  if (el.value !== cfg[k] && el.tagName === "SELECT") el.selectedIndex = 0;
+  const h = () => { cfg[k] = el.value.trim(); saveCfg(); };
+  el.addEventListener("change", h); el.addEventListener("input", h);
+});
+
+/* model dropdowns: every model listed on Google's models page (Oct 2026), plus a custom entry */
+const LIVE_MODELS = [
+  ["gemini-3.8-live","Gemini 3.8 Live (stable)"],
+  ["gemini-3.8-live-extended-thinking","Gemini 3.8 Live Extended Thinking (stable)"],
+  ["gemini-3.1-flash-live-preview","Gemini 3.1 Flash Live (preview, legacy)"],
+  ["gemini-2.5-flash-native-audio-preview-12-2025","Gemini 2.5 Flash native audio (past users only)"]
+];
+const TEXT_MODELS = [
+  ["gemini-3.8-flash","Gemini 3.8 Flash (stable, recommended)"],
+  ["gemini-3.6-flash","Gemini 3.6 Flash (stable)"],
+  ["gemini-3.5-flash-lite","Gemini 3.5 Flash-Lite (stable, light)"],
+  ["gemini-3.1-flash-lite","Gemini 3.1 Flash-Lite (stable, light)"],
+  ["gemini-3-flash-preview","Gemini 3 Flash (preview)"],
+  ["gemini-3.1-pro-preview","Gemini 3.1 Pro (preview, deeper, slower)"],
+  ["gemini-4-argon","Gemini 4 Argon (flagship reasoning)"],
+  ["gemini-2.5-pro","Gemini 2.5 Pro (past users only)"],
+  ["gemini-2.5-flash","Gemini 2.5 Flash (past users only)"],
+  ["gemini-2.5-flash-lite","Gemini 2.5 Flash-Lite (past users only)"]
+];
+const MODEL_LISTS = {mStd:LIVE_MODELS, mNat:LIVE_MODELS, mGram:TEXT_MODELS};
+Object.keys(MODEL_LISTS).forEach(k => {
+  const sel = $(k), inp = $(k + "C"), list = MODEL_LISTS[k];
+  list.forEach(([v, l]) => sel.add(new Option(l, v)));
+  sel.add(new Option("Andere (Name eingeben)…", "__custom"));
+  if (list.some(([v]) => v === cfg[k])) sel.value = cfg[k];
+  else { sel.value = "__custom"; inp.value = cfg[k]; inp.hidden = false; }
+  sel.addEventListener("change", () => {
+    if (sel.value === "__custom") { inp.hidden = false; inp.focus(); if (inp.value.trim()) cfg[k] = inp.value.trim(); }
+    else { inp.hidden = true; cfg[k] = sel.value; }
+    saveCfg();
+  });
+  inp.addEventListener("input", () => { if (inp.value.trim()) { cfg[k] = inp.value.trim(); saveCfg(); } });
+});
+
+function t(k){ return I18N[cfg.ui][k]; }
+function tx(bn, de){ return cfg.ui === "bn" ? bn : de; }
+function applyLang(){
+  document.documentElement.lang = cfg.ui;
+  const map = {"t-title":"title","t-settings":"settings","t-key":"key","t-voicemodel":"voicemodel","t-voice":"voice","t-level":"level",
+    "t-topic":"topic","t-fallback":"fallback","t-adv":"adv","t-hint":"hint","o-std":"std","o-nat":"nat","o-fb1":"fb1","o-fb0":"fb0",
+    "h-conv":"conv","h-coach":"coach","t-listening":"listening","convEmpty":"convEmpty","coachEmpty":"coachEmpty","langBtn":"langBtn"};
+  for (const id in map){ const el=$(id); if(el) el.textContent = t(map[id]); }
+  document.querySelectorAll("[data-bn]").forEach(el => { el.textContent = el.dataset[cfg.ui]; });
+  setMicLabel();
+  if (!$("viewProgress").hidden) renderProgress();
+  collapseFeed("convFeed","convExpand"); collapseFeed("coachFeed","coachExpand");
+  setThemeLabel();
+  renderGoal();
+}
+$("langBtn").addEventListener("click", () => { cfg.ui = cfg.ui === "bn" ? "de" : "bn"; saveCfg(); applyLang(); });
+function isDark(){
+  return document.documentElement.dataset.theme === "dark" ||
+    (!document.documentElement.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
+}
+function setThemeLabel(){ $("themeBtn").textContent = t(isDark() ? "themeLight" : "themeDark"); }
+$("themeBtn").addEventListener("click", () => {
+  cfg.theme = isDark() ? "light" : "dark"; saveCfg(); document.documentElement.dataset.theme = cfg.theme;
+  setThemeLabel();
+});
+if (cfg.theme) document.documentElement.dataset.theme = cfg.theme;
+setThemeLabel();
+
+/* ---------- helpers ---------- */
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function setStatus(msg, isErr){ const s=$("status"); s.textContent = msg || ""; s.classList.toggle("err", !!isErr); }
+function showNotice(msg){ const n=$("notice"); n.textContent=msg; n.hidden=!msg; }
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function b64FromBytes(bytes){
+  let bin = ""; const CH = 0x8000;
+  for (let i=0;i<bytes.length;i+=CH) bin += String.fromCharCode.apply(null, bytes.subarray(i,i+CH));
+  return btoa(bin);
+}
+function bytesFromB64(b64){
+  const bin = atob(b64); const out = new Uint8Array(bin.length);
+  for (let i=0;i<bin.length;i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+function catLabel(c){ const x = CAT[c] || CAT.other; return cfg.ui === "bn" ? x[0] : x[1]; }
+function fmtDate(ms){
+  try { return new Date(ms).toLocaleString(cfg.ui === "bn" ? "bn-BD" : "de-DE", {dateStyle:"medium", timeStyle:"short"}); }
+  catch(e){ return new Date(ms).toISOString().slice(0,16).replace("T"," "); }
+}
+function fmtPct(n){ return Math.round(Number(n) || 0) + "%"; }
+
+/* ---------- history store ---------- */
+const HKEY = "sprichfix_history";
+let hist = {sessions:[]};
+try { const h = JSON.parse(localStorage.getItem(HKEY) || "null"); if (h && Array.isArray(h.sessions)) hist = h; } catch(e){}
+function saveHist(){
+  try {
+    if (hist.sessions.length > 200) hist.sessions = hist.sessions.slice(-200);
+    localStorage.setItem(HKEY, JSON.stringify(hist));
+  } catch(e){}
+  try { renderGoal(); } catch(e){}
+}
+let curSession = null;
+let pendingChecks = [];
+
+function aggregate(sessions){
+  const a = {sessions:sessions.length, sentences:0, correct:0, cats:{}, rec:{}, vocab:{}, catTotal:0};
+  sessions.forEach(s => (s.items || []).forEach(it => {
+    const r = it.r; if (!r) return;
+    a.sentences++; if (r.correct) a.correct++;
+    (r.mistakes || []).forEach(m => {
+      const c = CAT[m.category] ? m.category : "other";
+      a.cats[c] = (a.cats[c] || 0) + 1; a.catTotal++;
+      const key = (m.wrong || "").trim().toLowerCase() + "→" + (m.right || "").trim().toLowerCase();
+      if (m.wrong) { const e = a.rec[key] || (a.rec[key] = {wrong:m.wrong, right:m.right, cat:c, n:0}); e.n++; }
+    });
+    (r.vocab || []).forEach(v => {
+      if (!v || !v.basic || !v.better) return;
+      a.vocab[v.basic.toLowerCase()] = {basic:v.basic, better:v.better, at:it.at || 0};
+    });
+  }));
+  return a;
+}
+function weakCats(){
+  const recent = hist.sessions.slice(-10);
+  const a = aggregate(recent);
+  return Object.entries(a.cats).filter(([,n]) => n >= 3).sort((x,y) => y[1]-x[1]).slice(0,3).map(([c]) => (CAT[c] || CAT.other)[1]);
+}
+
+/* ---------- transcript UI ---------- */
+let curMe = null, curAi = null, meText = "", aiText = "";
+function addBubble(kind){
+  $("convEmpty") && $("convEmpty").remove();
+  const d = document.createElement("div");
+  d.className = "msg " + kind + " live";
+  d.innerHTML = '<span class="who"></span><span class="txt"></span>';
+  d.querySelector(".who").textContent = kind === "me" ? t("you") : t("gemini");
+  $("convFeed").appendChild(d); scrollDown($("convFeed"));
+  return d;
+}
+function scrollDown(el){ el.scrollTop = el.scrollHeight; }
+
+/* ---------- show only the latest feed item, older ones under Expand ---------- */
+function collapseFeed(feedId, btnId){
+  const feed = $(feedId), btn = $(btnId);
+  if (!feed || !btn) return;
+  const items = [...feed.children].filter(el => !el.classList.contains("empty"));
+  const n = items.length, expanded = feed.dataset.expanded === "1";
+  if (n > 1 && !expanded){
+    items.slice(0, -1).forEach(el => { el.style.display = "none"; });
+    items[n-1].style.display = "";
+    btn.hidden = false;
+    btn.innerHTML = "&#9662; " + esc(tx("আগেরগুলো দেখো", "Frühere anzeigen")) + " (" + (n - 1) + ")";
+  } else {
+    items.forEach(el => { el.style.display = ""; });
+    btn.hidden = n <= 1;
+    if (n > 1) btn.innerHTML = "&#9652; " + esc(tx("লুকাও", "Ausblenden"));
+  }
+}
+function setupExpand(feedId, btnId){
+  const btn = $(btnId), feed = $(feedId);
+  if (!btn || !feed) return;
+  btn.addEventListener("click", () => {
+    feed.dataset.expanded = feed.dataset.expanded === "1" ? "" : "1";
+    collapseFeed(feedId, btnId);
+  });
+  new MutationObserver(() => collapseFeed(feedId, btnId)).observe(feed, {childList:true});
+}
+setupExpand("convFeed", "convExpand");
+setupExpand("coachFeed", "coachExpand");
+function appendMe(text){
+  if (!curMe) { curMe = addBubble("me"); meText = ""; }
+  meText += text; curMe.querySelector(".txt").textContent = meText; scrollDown($("convFeed"));
+}
+function appendAi(text){
+  flushUser();
+  if (!curAi) { curAi = addBubble("ai"); aiText = ""; }
+  aiText += text; curAi.querySelector(".txt").textContent = aiText; scrollDown($("convFeed"));
+}
+function flushUser(){
+  if (!curMe) return;
+  curMe.classList.remove("live");
+  const sentence = meText.trim();
+  curMe = null; meText = "";
+  if (sentence) checkGrammar(sentence);
+}
+function endTurn(){
+  flushUser();
+  if (curAi) { curAi.classList.remove("live"); curAi = null; aiText = ""; }
+}
+
+/* ---------- Gemini text calls (grammar, report, plan) ---------- */
+const FALLBACK_TEXT_MODEL = "gemini-3.5-flash-lite";
+let apiQueue = Promise.resolve();
+function callGemini(system, user, schema, temp, key){
+  /* queued calls (coach, report, plan) use the coach key if one is set */
+  const run = () => callGeminiNow(system, user, schema, temp, key || cfg.apiKey2 || cfg.apiKey);
+  const p = apiQueue.then(run, run);
+  apiQueue = p.catch(() => {});
+  return p;
+}
+async function callGeminiNow(system, user, schema, temp, key){
+  const body = {
+    systemInstruction:{parts:[{text:system}]},
+    contents: Array.isArray(user) ? user : [{role:"user", parts:[{text:user}]}],
+    generationConfig:{temperature: temp == null ? 0.2 : temp}
+  };
+  if (schema) { body.generationConfig.responseMimeType = "application/json"; body.generationConfig.responseSchema = schema; }
+  const models = [cfg.mGram];
+  if (cfg.mGram !== FALLBACK_TEXT_MODEL) models.push(FALLBACK_TEXT_MODEL);
+  let lastErr = "";
+  for (const model of models) {
+    const url = "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent";
+    const waits = [0, 2500, 6000];
+    for (let attempt = 0; attempt < waits.length; attempt++) {
+      if (waits[attempt]) await sleep(waits[attempt]);
+      let res;
+      try { res = await fetch(url, {method:"POST", headers:{"Content-Type":"application/json","x-goog-api-key":key || cfg.apiKey}, body:JSON.stringify(body)}); }
+      catch (e) { lastErr = "network error"; continue; }
+      if (res.ok) {
+        const data = await res.json();
+        const parts = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts;
+        if (!parts) { lastErr = "empty reply"; break; }
+        return parts.map(p => p.text || "").join("");
+      }
+      let detail = "";
+      try { const j = await res.json(); detail = j.error && j.error.message ? ": " + String(j.error.message).slice(0, 140) : ""; } catch(e){}
+      lastErr = "HTTP " + res.status + detail;
+      if (res.status !== 429 && res.status !== 503) break;
+    }
+  }
+  throw new Error(lastErr || "failed");
+}
+
+/* ---------- grammar coach ---------- */
+const GRAMMAR_SCHEMA = {
+  type:"OBJECT",
+  properties:{
+    correct:{type:"BOOLEAN"},
+    corrected:{type:"STRING"},
+    mistakes:{type:"ARRAY", items:{type:"OBJECT", properties:{
+      wrong:{type:"STRING"}, right:{type:"STRING"}, category:{type:"STRING", enum:CAT_IDS}, why_bn:{type:"STRING"}
+    }, required:["wrong","right","category","why_bn"]}},
+    explanation_bn:{type:"STRING"},
+    suggestions:{type:"ARRAY", items:{type:"OBJECT", properties:{style:{type:"STRING"}, text:{type:"STRING"}}, required:["style","text"]}},
+    vocab:{type:"ARRAY", items:{type:"OBJECT", properties:{basic:{type:"STRING"}, better:{type:"STRING"}}, required:["basic","better"]}},
+    tip_bn:{type:"STRING"},
+    word_errors:{type:"ARRAY", items:{type:"OBJECT", properties:{word:{type:"STRING"}, correct_use:{type:"STRING"}, issue_bn:{type:"STRING"}}, required:["word","correct_use","issue_bn"]}}
+  },
+  required:["correct","corrected","mistakes","explanation_bn","suggestions","vocab","tip_bn","word_errors"]
+};
+function grammarPrompt(){
+  return "You are a kind but exact German grammar coach for a Bengali-speaking learner at A1 level (Goethe-Zertifikat A1, complete beginner, level: " + cfg.level + "). " +
+    "The target is solid A1: simple correct sentences, correct articles (der/die/das), correct verb conjugation in the present tense, the verb in second position, correct basic word order, and correct negation with nicht/kein. " +
+    "The input is one spoken sentence that was transcribed automatically, so ignore punctuation, capital letters and likely transcription slips. " +
+    "Judge only grammar, word choice and how natural it sounds. " +
+    "Return JSON. 'correct' is true only if the sentence needs no change. 'corrected' is the fixed sentence (same as input if correct). " +
+    "'mistakes' lists each wrong fragment exactly as written in the input (copy the words exactly) with its fix, a category from the allowed list, and 'why_bn': a very short Bengali reason for that one fix. " +
+    "'explanation_bn' is a short explanation in Bengali, at most two sentences, naming the rule in simple words (keep German grammar terms in German). Empty string if correct. " +
+    "'suggestions' has exactly one entry with style 'Natural': how a fluent speaker would say the same idea, relaxed and native-sounding, still at A1 level with simple words, easy to say out loud. Keep the meaning the same and the suggestion to one or two sentences. " +
+    "'vocab' lists up to two basic words or phrases from the sentence with a natural everyday stronger alternative that is easy to use in speech (A1 level), or an empty list. " +
+    "'word_errors' lists words or phrases the learner used wrongly or in the wrong context (wrong word, wrong collocation, wrong meaning, a confusable word). Each has 'word' as said, 'correct_use' (the right word or phrase for this context) and 'issue_bn' (a short Bengali reason). Do not repeat what is already in 'mistakes'. Empty list if none. " +
+    "'tip_bn' is one short encouraging Bengali tip with one small easy change that would make this sentence sound more natural at A1 (for example the correct article or one everyday better word), or an empty string if it is already good or too short to matter. " +
+    "If the learner spoke Bengali instead of German, set correct to false, put the German translation in 'corrected', category 'other', and explain in Bengali.";
+}
+function highlight(text, mistakes){
+  const lower = text.toLowerCase(); const ranges = [];
+  (mistakes || []).forEach(m => {
+    const w = (m.wrong || "").trim().toLowerCase(); if (!w) return;
+    const i = lower.indexOf(w); if (i >= 0) ranges.push([i, i + w.length]);
+  });
+  ranges.sort((a,b) => a[0]-b[0]);
+  const merged = [];
+  ranges.forEach(r => { const l = merged[merged.length-1]; if (l && r[0] <= l[1]) l[1] = Math.max(l[1], r[1]); else merged.push(r.slice()); });
+  let out = "", pos = 0;
+  merged.forEach(([a,b]) => { out += esc(text.slice(pos,a)) + "<mark>" + esc(text.slice(a,b)) + "</mark>"; pos = b; });
+  return out + esc(text.slice(pos));
+}
+function cardHTML(orig, r){
+  let html = '<span class="tag">' + esc(t("you")) + '</span>';
+  if (r.correct) {
+    html += '<div class="orig">' + esc(orig) + '</div><div class="perfect">' + esc(t("perfect")) + '</div>';
+  } else {
+    html += '<div class="orig">' + highlight(orig, r.mistakes) + '</div>';
+    const cats = [...new Set((r.mistakes || []).map(m => CAT[m.category] ? m.category : "other"))];
+    if (cats.length) html += '<div class="chips">' + cats.map(c => '<span class="chip bad">' + esc(catLabel(c)) + '</span>').join("") + '</div>';
+    html += '<span class="tag">' + esc(t("fixed")) + '</span><div class="fix">✅ ' + esc(r.corrected) + '</div>';
+    if (r.explanation_bn) html += '<div class="why">' + esc(r.explanation_bn) + '</div>';
+  }
+  const sug = (r.suggestions && r.suggestions.length) ? r.suggestions : (r.natural ? [{style:"Natural", text:r.natural}] : []);
+  if (sug.length) {
+    html += '<span class="tag">' + esc(tx("কীভাবে বললে আরও ভালো হতো", "So klingt es besser")) + '</span>';
+    sug.forEach(s => { html += '<div class="nat"><b>' + esc(s.style) + ':</b> ' + esc(s.text) + '</div>'; });
+  }
+  if (r.vocab && r.vocab.length)
+    html += '<div class="chips">' + r.vocab.map(v => '<span class="chip">' + esc(v.basic) + ' → <b>' + esc(v.better) + '</b></span>').join("") + '</div>';
+  if (r.word_errors && r.word_errors.length)
+    html += '<span class="tag">' + esc(tx("শব্দের ভুল ব্যবহার", "Falsche Wortverwendung")) + '</span>' + r.word_errors.map(w => '<div class="why"><s style="color:var(--bad)">' + esc(w.word) + '</s> → <b>' + esc(w.correct_use) + '</b>' + (w.issue_bn ? ' · ' + esc(w.issue_bn) : '') + '</div>').join("");
+  if (r.tip_bn) html += '<div class="why">🎯 ' + esc(r.tip_bn) + '</div>';
+  if (r.pron_score > 0 || (r.pron_issues && r.pron_issues.length) || r.fluency_bn) {
+    html += '<span class="tag">' + esc(tx("উচ্চারণ ও ফ্লুয়েন্সি (অডিও থেকে, অনুমান)", "Aussprache & Flüssigkeit (aus dem Audio, Schätzung)")) + '</span>';
+    if (r.pron_score > 0) html += '<div class="chips"><span class="chip">' + esc(tx("উচ্চারণ", "Aussprache")) + ' ' + fmtPct(r.pron_score) + '</span></div>';
+    (r.pron_issues || []).forEach(p => { html += '<div class="why"><b>' + esc(p.word) + '</b> · ' + esc(p.tip_bn) + '</div>'; });
+    if (r.fluency_bn) html += '<div class="why">' + esc(r.fluency_bn) + '</div>';
+  }
+  return html;
+}
+function checkGrammar(sentence){
+  $("coachEmpty") && $("coachEmpty").remove();
+  const sess = curSession;
+  const item = {orig:sentence, at:Date.now(), r:null};
+  if (sess) sess.items.push(item);
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = '<span class="tag">' + esc(t("you")) + '</span><div class="orig">' + esc(sentence) + '</div><div class="pending">' + esc(t("checking")) + '</div>';
+  $("coachFeed").appendChild(card); scrollDown($("coachFeed"));
+  const p = (async () => {
+    try {
+      const raw = await callGemini(grammarPrompt(), sentence, GRAMMAR_SCHEMA, 0.2);
+      const r = JSON.parse(raw);
+      if (!Array.isArray(r.mistakes)) r.mistakes = [];
+      item.r = r; saveHist();
+      card.innerHTML = cardHTML(sentence, r);
+    } catch (err) {
+      const pe = card.querySelector(".pending");
+      if (pe) { pe.className = "status err"; pe.textContent = t("gramfail") + " (" + err.message + ")"; }
+    }
+    scrollDown($("coachFeed"));
+  })();
+  pendingChecks.push(p);
+}
+
+/* ---------- Goethe A1 session report ---------- */
+const REPORT_SCHEMA = {
+  type:"OBJECT",
+  properties:{
+    fluency:{type:"NUMBER"}, lexical:{type:"NUMBER"}, grammar:{type:"NUMBER"},
+    reliability_bn:{type:"STRING"},
+    gap_to_a1_bn:{type:"STRING"},
+    strengths_bn:{type:"STRING"},
+    weaknesses:{type:"ARRAY", items:{type:"OBJECT", properties:{area:{type:"STRING"}, detail_bn:{type:"STRING"}}, required:["area","detail_bn"]}},
+    actions_bn:{type:"ARRAY", items:{type:"STRING"}},
+    upgrades:{type:"ARRAY", items:{type:"OBJECT", properties:{basic:{type:"STRING"}, better:{type:"STRING"}}, required:["basic","better"]}}
+  },
+  required:["fluency","lexical","grammar","reliability_bn","gap_to_a1_bn","strengths_bn","weaknesses","actions_bn","upgrades"]
+};
+function reportPrompt(){
+  return "You are an experienced Goethe-Zertifikat A1 examiner coaching a Bengali-speaking candidate who is learning German from zero. " +
+    "You get the candidate's spoken sentences (automatic transcript) with the corrections already found. " +
+    "Estimate three criteria as a percentage of solid A1 level (0-100, whole numbers): fluency (can they keep speaking in simple sentences without long pauses), vocabulary (everyday A1 words used correctly), grammar (articles, conjugation, word order, negation). " +
+    "Be realistic but encouraging. A1 means: can introduce themselves, ask and answer simple questions about familiar topics (family, home, food, free time, shopping), using simple phrases and sentences; frequent pauses and mistakes are still normal. " +
+    "You only have text, so you cannot hear pauses or pronunciation: infer fluency from sentence length and variety, and do not score pronunciation. " +
+    "If there are fewer than six sentences, say in 'reliability_bn' that the estimate is rough. " +
+    "Write every *_bn field in Bengali (keep German terms and examples in German). " +
+    "'gap_to_a1_bn': in two or three sentences, what separates this candidate from solid A1. " +
+    "'weaknesses': the two to four biggest weak areas with concrete detail and an example from the transcript. " +
+    "'actions_bn': exactly three specific practice actions for the next session. " +
+    "'upgrades': up to five basic words or phrases the candidate used with a natural everyday better alternative that is easy to say in speech (A1 level).";
+}
+function sessionTranscript(sess){
+  return sess.items.filter(i => i.r).map((i, n) => {
+    const errs = (i.r.mistakes || []).map(m => m.category).join(", ");
+    return (n+1) + ". Said: " + i.orig + (i.r.correct ? " | no errors" : " | Corrected: " + i.r.corrected + " | Error types: " + errs);
+  }).join("\n");
+}
+async function makeReport(sess){
+  const card = document.createElement("div");
+  card.className = "report";
+  card.innerHTML = '<div class="pending">' + esc(tx("সেশনের রিপোর্ট তৈরি হচ্ছে…", "Dein Sitzungsbericht wird erstellt…")) + '</div>';
+  $("coachFeed").appendChild(card); scrollDown($("coachFeed"));
+  try {
+    await Promise.allSettled(pendingChecks);
+    const done = sess.items.filter(i => i.r);
+    if (done.length < 3) { card.remove(); return; }
+    const raw = await callGemini(reportPrompt(), "Level: " + sess.level + "\nTopic: " + sess.topic + "\nSentences: " + done.length + "\n\n" + sessionTranscript(sess), REPORT_SCHEMA, 0.3);
+    const s = JSON.parse(raw);
+    const clamp = n => Math.max(0, Math.min(100, Math.round(Number(n) || 0)));
+    s.fluency = clamp(s.fluency); s.lexical = clamp(s.lexical); s.grammar = clamp(s.grammar);
+    s.overall = Math.round((s.fluency + s.lexical + s.grammar) / 3);
+    const ps = done.map(i => Number(i.r.pron_score)).filter(n => n > 0);
+    if (ps.length) { s.pron = clamp(ps.reduce((a,b) => a + b, 0) / ps.length); s.overall = Math.round((s.fluency + s.lexical + s.grammar + s.pron) / 4); }
+    sess.summary = s; saveHist();
+    card.innerHTML = reportHTML(s);
+  } catch (err) {
+    card.innerHTML = '<div class="status err">' + esc(tx("রিপোর্ট তৈরি হয়নি", "Bericht fehlgeschlagen")) + " (" + esc(err.message) + ")</div>";
+  }
+  scrollDown($("coachFeed"));
+}
+function reportHTML(s){
+  const b = (label, v, main) => '<div class="band' + (main ? " main" : "") + '"><b>' + fmtPct(v) + '</b><span>' + esc(label) + '</span></div>';
+  let h = '<h4>' + esc(tx("A1 অনুমান (লক্ষ্য: মজবুত A1)", "A1-Einschätzung (Ziel: solides A1)")) + '</h4>';
+  h += '<div class="bands">' + b(tx("সাবলীলতা", "Flüssigkeit"), s.fluency) + b(tx("শব্দভান্ডার", "Wortschatz"), s.lexical) + b(tx("ব্যাকরণ", "Grammatik"), s.grammar) + (s.pron ? b(tx("Pronunciation (অনুমান)", "Aussprache (geschätzt)"), s.pron) : "") + b(s.pron ? tx("গড় (৪টি)", "Durchschnitt (4)") : tx("গড় (৩টি)", "Durchschnitt (3 von 4)"), s.overall, true) + '</div>';
+  if (!s.pron) h += '<div class="pending">' + esc(tx("Pronunciation লেখা থেকে মাপা যায় না, তাই ধরা হয়নি। এটা শুধু অনুমান, আসল পরীক্ষার ফল নয়।", "Aussprache kann aus Text nicht beurteilt werden, sie wird daher nicht bewertet. Das ist nur eine grobe Einschätzung, kein Prüfungsergebnis.")) + '</div>';
+  if (s.reliability_bn) h += '<div class="why">' + esc(s.reliability_bn) + '</div>';
+  if (s.gap_to_a1_bn) h += '<span class="tag">' + esc(tx("A1 থেকে দূরত্ব", "Was bis zu solidem A1 fehlt")) + '</span><div class="why">' + esc(s.gap_to_a1_bn) + '</div>';
+  if (s.strengths_bn) h += '<span class="tag">' + esc(tx("ভালো দিক", "Stärken")) + '</span><div class="fix">' + esc(s.strengths_bn) + '</div>';
+  if (s.weaknesses && s.weaknesses.length) h += '<span class="tag">' + esc(tx("দুর্বল দিক", "Schwachstellen")) + '</span><ul>' + s.weaknesses.map(w => '<li><b>' + esc(w.area) + '</b>: ' + esc(w.detail_bn) + '</li>').join("") + '</ul>';
+  if (s.actions_bn && s.actions_bn.length) h += '<span class="tag">' + esc(tx("পরের সেশনে করণীয়", "Nächste Sitzung")) + '</span><ul>' + s.actions_bn.map(a => '<li>' + esc(a) + '</li>').join("") + '</ul>';
+  if (s.upgrades && s.upgrades.length) h += '<div class="chips">' + s.upgrades.map(v => '<span class="chip">' + esc(v.basic) + ' → <b>' + esc(v.better) + '</b></span>').join("") + '</div>';
+  return h;
+}
+
+/* ---------- audio: mic capture ---------- */
+const WORKLET = "class P extends AudioWorkletProcessor{process(i){const c=i[0]&&i[0][0];if(c)this.port.postMessage(c.slice(0));return true}}registerProcessor('cap',P);";
+let micCtx = null, micStream = null, micNode = null, micSrc = null, muteGain = null;
+let pending = [], pendingLen = 0;
+
+function floatToPcm16(f){
+  const o = new Int16Array(f.length);
+  for (let i=0;i<f.length;i++){ const s = Math.max(-1, Math.min(1, f[i])); o[i] = s < 0 ? s * 0x8000 : s * 0x7fff; }
+  return o;
+}
+function downsample(f, from, to){
+  if (from === to) return f;
+  const ratio = from / to, n = Math.floor(f.length / ratio), out = new Float32Array(n);
+  for (let i=0;i<n;i++){
+    const a = Math.floor(i*ratio), b = Math.min(f.length, Math.floor((i+1)*ratio));
+    let sum = 0; for (let j=a;j<b;j++) sum += f[j];
+    out[i] = sum / Math.max(1, b - a);
+  }
+  return out;
+}
+async function startMic(){
+  micStream = await navigator.mediaDevices.getUserMedia({audio:{channelCount:1, echoCancellation:true, noiseSuppression:true, autoGainControl:true}});
+  try { micCtx = new AudioContext({sampleRate:16000}); } catch(e){ micCtx = new AudioContext(); }
+  const blobUrl = URL.createObjectURL(new Blob([WORKLET], {type:"application/javascript"}));
+  await micCtx.audioWorklet.addModule(blobUrl);
+  micSrc = micCtx.createMediaStreamSource(micStream);
+  micNode = new AudioWorkletNode(micCtx, "cap");
+  muteGain = micCtx.createGain(); muteGain.gain.value = 0;
+  micSrc.connect(micNode); micNode.connect(muteGain); muteGain.connect(micCtx.destination);
+  micNode.port.onmessage = e => {
+    if (usingKind === "audio") {
+      if (audRec) { const f = downsample(e.data, micCtx.sampleRate, 16000); audChunks.push(f); audLen += f.length; }
+      return;
+    }
+    if (!ws || ws.readyState !== 1 || !setupDone) return;
+    const f = downsample(e.data, micCtx.sampleRate, 16000);
+    pending.push(f); pendingLen += f.length;
+    if (pendingLen >= 1600) {
+      const all = new Float32Array(pendingLen); let o = 0;
+      pending.forEach(p => { all.set(p, o); o += p.length; });
+      pending = []; pendingLen = 0;
+      ws.send(JSON.stringify({realtimeInput:{audio:{data:b64FromBytes(new Uint8Array(floatToPcm16(all).buffer)), mimeType:"audio/pcm;rate=16000"}}}));
+    }
+  };
+}
+function stopMic(){
+  vizStop(true);
+  try { micNode && micNode.disconnect(); micSrc && micSrc.disconnect(); } catch(e){}
+  micStream && micStream.getTracks().forEach(tr => tr.stop());
+  micCtx && micCtx.close().catch(()=>{});
+  micCtx = micStream = micNode = micSrc = null; pending = []; pendingLen = 0;
+}
+
+/* ---------- mic + speaker reactive glow: driven by real audio input ---------- */
+let vizAn = null, vizData = null, vizRaf = 0, vizLevel = 0, vizGen = 0;
+let vizOwnCtx = null, vizOwnSrc = null, vizOwnStream = null;
+let outMaster = null, playAn = null, playData = null;
+let micActive = false, playActive = false;
+function vizRms(d){
+  let sum = 0;
+  for (let i = 0; i < d.length; i++){ const v = (d[i] - 128) / 128; sum += v * v; }
+  return Math.sqrt(sum / d.length);
+}
+function glowTick(){
+  let target = 0;
+  if (vizAn && micActive){ vizAn.getByteTimeDomainData(vizData); target = Math.max(target, vizRms(vizData)); }
+  if (playAn && playActive){ playAn.getByteTimeDomainData(playData); target = Math.max(target, vizRms(playData)); }
+  target = Math.min(1, target * 3.5);
+  vizLevel += (target - vizLevel) * (target > vizLevel ? 0.45 : 0.2);
+  $("micBtn").style.setProperty("--mic-level", vizLevel.toFixed(3));
+  if (micActive || playActive) vizRaf = requestAnimationFrame(glowTick);
+  else if (vizLevel > 0.02){ vizLevel *= 0.8; vizRaf = requestAnimationFrame(glowTick); }
+  else vizRaf = 0;
+}
+function glowEnsure(){
+  $("micBtn").classList.add("live");
+  if (!vizRaf) vizRaf = requestAnimationFrame(glowTick);
+}
+function glowFade(){
+  const gen = ++vizGen;
+  if (vizRaf){ cancelAnimationFrame(vizRaf); vizRaf = 0; }
+  const btn = $("micBtn");
+  const fade = () => {
+    if (gen !== vizGen) return;
+    vizLevel *= 0.78;
+    btn.style.setProperty("--mic-level", vizLevel.toFixed(3));
+    if (vizLevel > 0.015) requestAnimationFrame(fade);
+    else { btn.style.setProperty("--mic-level", "0"); btn.classList.remove("live"); }
+  };
+  fade();
+}
+async function vizStart(){
+  const gen = ++vizGen;
+  if (micActive) return;
+  try {
+    if (!vizAn) {
+      if (micStream && micCtx && micSrc) {
+        vizAn = micCtx.createAnalyser();
+        micSrc.connect(vizAn);
+      } else {
+        vizOwnCtx = new (window.AudioContext || window.webkitAudioContext)();
+        vizOwnStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true, noiseSuppression:true, autoGainControl:true}});
+        if (gen !== vizGen) throw 0;
+        vizOwnSrc = vizOwnCtx.createMediaStreamSource(vizOwnStream);
+        vizAn = vizOwnCtx.createAnalyser();
+        vizOwnSrc.connect(vizAn);
+      }
+      vizAn.fftSize = 512;
+      vizAn.smoothingTimeConstant = 0.45;
+      vizData = new Uint8Array(vizAn.fftSize);
+      try { if (vizAn.context.state === "suspended") await vizAn.context.resume(); } catch(e){}
+      if (gen !== vizGen) throw 0;
+    }
+    micActive = true;
+    glowEnsure();
+  } catch(e){ vizCleanup(); }
+}
+function vizStop(hard){
+  ++vizGen;
+  micActive = false;
+  if (hard){
+    if (vizRaf){ cancelAnimationFrame(vizRaf); vizRaf = 0; }
+    vizCleanup();
+    if (playActive){ vizLevel = 0; glowEnsure(); }
+    else { vizLevel = 0; $("micBtn").style.setProperty("--mic-level", "0"); $("micBtn").classList.remove("live"); }
+    return;
+  }
+  if (!playActive) glowFade();
+}
+function vizCleanup(){
+  try { vizAn && vizAn.disconnect(); } catch(e){}
+  try { vizOwnSrc && vizOwnSrc.disconnect(); } catch(e){}
+  try { vizOwnStream && vizOwnStream.getTracks().forEach(tr => tr.stop()); } catch(e){}
+  try { vizOwnCtx && vizOwnCtx.close(); } catch(e){}
+  vizAn = vizData = null; vizOwnCtx = vizOwnSrc = vizOwnStream = null;
+}
+/* speaker playback glow */
+function playGlowStart(){ playActive = true; glowEnsure(); }
+function playGlowStop(){ playActive = false; if (!micActive) glowFade(); }
+
+/* ---------- audio: playback ---------- */
+let outCtx = null, nextTime = 0, playing = [];
+function playPcm(b64){
+  if (!outCtx) { outCtx = new AudioContext({sampleRate:24000}); nextTime = 0; }
+  if (outCtx.state === "suspended") outCtx.resume();
+  if (!outMaster){
+    outMaster = outCtx.createGain();
+    playAn = outCtx.createAnalyser();
+    playAn.fftSize = 512;
+    playData = new Uint8Array(playAn.fftSize);
+    outMaster.connect(playAn);
+    playAn.connect(outCtx.destination);
+  }
+  const bytes = bytesFromB64(b64);
+  const i16 = new Int16Array(bytes.buffer, bytes.byteOffset, Math.floor(bytes.byteLength / 2));
+  const f = new Float32Array(i16.length);
+  for (let i=0;i<i16.length;i++) f[i] = i16[i] / 0x8000;
+  const buf = outCtx.createBuffer(1, f.length, 24000); buf.copyToChannel(f, 0);
+  const src = outCtx.createBufferSource(); src.buffer = buf; src.connect(outMaster);
+  nextTime = Math.max(nextTime, outCtx.currentTime + 0.02);
+  src.start(nextTime); nextTime += buf.duration;
+  playing.push(src); playGlowStart();
+  src.onended = () => {
+    playing = playing.filter(s => s !== src);
+    setTimeout(() => { if (!playing.length) playGlowStop(); }, 350);
+  };
+}
+function stopPlayback(){
+  playing.forEach(s => { try { s.stop(); } catch(e){} }); playing = []; nextTime = 0;
+  playGlowStop();
+}
+
+/* ---------- Gemini Live socket ---------- */
+let ws = null, active = false, setupDone = false, resumeHandle = null, retries = 0, usingKind = "standard";
+let startedAt = 0, timerId = null;
+
+function convPrompt(){
+  let p = "You are a friendly German conversation partner for a Bengali-speaking learner at A1 level (Goethe A1, complete beginner). Learner level: " + cfg.level + ". Topic: " + cfg.topic + ". " +
+    "Always reply in German, in one to three short simple sentences using A1 vocabulary and mostly the present tense, then ask one simple follow-up question that the learner can answer in one or two short sentences. " +
+    "Keep your wording slow and clear: short sentences, everyday words, no idioms. Do not correct grammar; a separate coach does that. " +
+    "If the learner speaks Bengali, answer briefly in German and gently invite them to try again in German.";
+  if (cfg.focus === "1") {
+    const w = weakCats();
+    if (w.length) p += " This learner often struggles with: " + w.join(", ") + ". Without mentioning it, ask questions that naturally make them use these (for example, questions about their family or their home for article problems).";
+  }
+  return p;
+}
+function modelName(kind){ return kind === "native" ? cfg.mNat : cfg.mStd; }
+
+function openSocket(){
+  setupDone = false;
+  const url = "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=" + encodeURIComponent(cfg.apiKey);
+  ws = new WebSocket(url);
+  const mine = ws;
+  mine.onopen = () => {
+    const speech = {voiceConfig:{prebuiltVoiceConfig:{voiceName:cfg.voice}}};
+    const setup = {
+      model:"models/" + modelName(usingKind),
+      generationConfig:{responseModalities:["AUDIO"], speechConfig:speech},
+      systemInstruction:{parts:[{text:convPrompt()}]},
+      inputAudioTranscription:{},
+      outputAudioTranscription:{},
+      contextWindowCompression:{slidingWindow:{}},
+      sessionResumption: resumeHandle ? {handle:resumeHandle} : {}
+    };
+    mine.send(JSON.stringify({setup}));
+  };
+  mine.onmessage = async ev => {
+    let text = ev.data; if (text instanceof Blob) text = await text.text();
+    let msg; try { msg = JSON.parse(text); } catch(e){ return; }
+    handleMsg(msg);
+  };
+  mine.onerror = () => {};
+  mine.onclose = ev => { if (mine === ws) onSocketClosed(ev); };
+}
+
+function handleMsg(msg){
+  if (msg.setupComplete !== undefined) {
+    setupDone = true; retries = 0; setStatus(t("live"));
+    return;
+  }
+  if (msg.sessionResumptionUpdate && msg.sessionResumptionUpdate.newHandle) resumeHandle = msg.sessionResumptionUpdate.newHandle;
+  if (msg.goAway) { try { ws.close(); } catch(e){} return; }
+  const sc = msg.serverContent; if (!sc) return;
+  if (sc.interrupted) { stopPlayback(); endTurn(); }
+  if (sc.inputTranscription && sc.inputTranscription.text) appendMe(sc.inputTranscription.text);
+  if (sc.modelTurn && sc.modelTurn.parts) {
+    flushUser();
+    sc.modelTurn.parts.forEach(p => { if (p.inlineData && p.inlineData.data) playPcm(p.inlineData.data); });
+  }
+  if (sc.outputTranscription && sc.outputTranscription.text) appendAi(sc.outputTranscription.text);
+  if (sc.turnComplete) endTurn();
+}
+
+function onSocketClosed(ev){
+  if (!active) return;
+  const reason = (ev.reason || "").toString();
+  const quota = /quota|exhaust|limit|429|rate/i.test(reason);
+  if (usingKind === "native" && cfg.fallback === "1" && (!setupDone || quota)) {
+    usingKind = "standard"; resumeHandle = null;
+    showNotice(t("fellback")); setStatus(t("connecting")); openSocket(); return;
+  }
+  if (usingKind === "standard" && cfg.fallback === "1" && quota) { switchToAudio(); return; }
+  if (!setupDone && !resumeHandle) {
+    stopSession(); setStatus(t("failed") + (reason ? ": " + reason : " (code " + ev.code + ")"), true); return;
+  }
+  if (retries < 5) {
+    retries++; setStatus(t("reconnecting")); setTimeout(() => { if (active) openSocket(); }, 600 * retries);
+  } else {
+    stopSession(); setStatus(t("failed") + (reason ? ": " + reason : ""), true);
+  }
+}
+
+/* ---------- Chrome voice mode (one request per turn) ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, browserBusy = false, browserHist = [], recCooldownUntil = 0, netRetries = 0;
+const COMBO_SCHEMA = (() => { const c = JSON.parse(JSON.stringify(GRAMMAR_SCHEMA)); c.properties.reply = {type:"STRING"}; c.required.push("reply"); return c; })();
+function comboPrompt(){
+  return "Each request has two parts. The earlier messages are conversation context. The last user message is what the learner just said.\n\n" +
+    "PART A, coach analysis of the learner's last message only:\n" + grammarPrompt() + "\n\n" +
+    "PART B, the conversation partner. Put it in the JSON field 'reply'. " + convPrompt() +
+    " The reply is spoken aloud, so use plain sentences with no markdown, lists or emojis.";
+}
+function showInterim(text){
+  if (!curMe) { curMe = addBubble("me"); meText = ""; }
+  curMe.querySelector(".txt").textContent = text; scrollDown($("convFeed"));
+}
+function clearInterim(){ if (curMe) { curMe.remove(); curMe = null; meText = ""; } }
+function listenAgain(){ if (!active || browserBusy || usingKind !== "browser" || !rec) return; if (Date.now() < recCooldownUntil) return; try { rec.start(); } catch(e){} }
+function resumeListening(){ if (!active || usingKind !== "browser") return; browserBusy = false; setStatus(t("live")); listenAgain(); }
+function startBrowser(){
+  if (!SR) { stopSession(); setStatus(tx("এই ব্রাউজারে ভয়েস চলে না। Chrome ব্যবহার করুন।", "Dieser Browser hat keine Spracherkennung. Benutze Chrome."), true); return false; }
+  rec = new SR(); rec.lang = "de-DE"; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+  netRetries = 0; recCooldownUntil = 0;
+  rec.onresult = e => {
+    let interim = "", fin = "";
+    for (let i = e.resultIndex; i < e.results.length; i++) { const r = e.results[i]; if (r.isFinal) fin += r[0].transcript; else interim += r[0].transcript; }
+    if (fin.trim()) { clearInterim(); browserTurn(fin.trim()); }
+    else if (interim) showInterim(interim);
+  };
+  rec.onerror = e => {
+    if (e.error === "not-allowed" || e.error === "service-not-allowed") { stopSession(); setStatus(t("nomic"), true); }
+    else if (e.error === "network") {
+      netRetries++;
+      if (netRetries <= 3) {
+        const wait = [1000, 2500, 5000][netRetries - 1];
+        recCooldownUntil = Date.now() + wait;
+        setStatus(tx("নেটওয়ার্ক সমস্যা, আবার চেষ্টা করছি…", "Netzwerkproblem, neuer Versuch…"), true);
+        setTimeout(() => { if (active && usingKind === "browser" && !browserBusy) listenAgain(); }, wait + 150);
+      } else {
+        stopSession();
+        setStatus(tx("ভয়েস চিনতে নেটওয়ার্ক সমস্যা হচ্ছে। ইন্টারনেট চেক করে মাইক বাটন আবার চাপো।", "Netzwerkfehler bei der Spracherkennung. Prüfe dein Internet und tippe erneut auf die Mikrofontaste."), true);
+      }
+    }
+  };
+  rec.onend = () => { if (active && !browserBusy) setTimeout(listenAgain, 150); };
+  setStatus(t("live")); listenAgain(); vizStart(); return true;
+}
+function switchToBrowser(){
+  ws = null; stopMic(); usingKind = "browser"; browserBusy = false;
+  showNotice(tx("Live ভয়েসের সীমা শেষ। Chrome ভয়েসে চলে গেছি।", "Live-Stimmen-Limit erreicht. Zur Chrome-Stimme gewechselt."));
+  startBrowser();
+}
+function pickVoice(){
+  const v = (window.speechSynthesis ? speechSynthesis.getVoices() : []).filter(x => /^de/i.test(x.lang));
+  return v.find(x => /natural|online/i.test(x.name)) || v.find(x => /google/i.test(x.name) && /de-DE/i.test(x.lang)) || v.find(x => /de-DE/i.test(x.lang)) || v[0] || null;
+}
+function speakReply(text){
+  if (!window.speechSynthesis) { resumeListening(); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text); const v = pickVoice();
+  if (v) { u.voice = v; u.lang = v.lang; } else u.lang = "de-DE";
+  u.onend = u.onerror = () => resumeListening();
+  setStatus(tx("বলছে…", "Spricht…"));
+  speechSynthesis.speak(u);
+}
+function browserTurn(sentence){
+  browserBusy = true; try { rec.abort(); } catch(e){}
+  $("coachEmpty") && $("coachEmpty").remove();
+  const me = addBubble("me"); me.classList.remove("live"); me.querySelector(".txt").textContent = sentence;
+  const ai = addBubble("ai"); ai.querySelector(".txt").textContent = "…";
+  const card = document.createElement("div"); card.className = "card";
+  card.innerHTML = '<span class="tag">' + esc(t("you")) + '</span><div class="orig">' + esc(sentence) + '</div><div class="pending">' + esc(t("checking")) + '</div>';
+  $("coachFeed").appendChild(card); scrollDown($("coachFeed"));
+  const item = {orig:sentence, at:Date.now(), r:null};
+  if (curSession) curSession.items.push(item);
+  const contents = browserHist.map(h => ({role:h.role, parts:[{text:h.text}]})).concat([{role:"user", parts:[{text:sentence}]}]);
+  setStatus(tx("ভাবছে…", "Denkt nach…"));
+  const p = (async () => {
+    let reply = "";
+    try {
+      const r = JSON.parse(await callGemini(comboPrompt(), contents, COMBO_SCHEMA, 0.4, cfg.apiKey));
+      if (!Array.isArray(r.mistakes)) r.mistakes = [];
+      reply = String(r.reply || "").trim(); delete r.reply;
+      item.r = r; saveHist(); card.innerHTML = cardHTML(sentence, r);
+      browserHist.push({role:"user", text:sentence}, {role:"model", text:reply});
+      if (browserHist.length > 16) browserHist = browserHist.slice(-16);
+    } catch (err) {
+      const pe = card.querySelector(".pending");
+      if (pe) { pe.className = "status err"; pe.textContent = t("gramfail") + " (" + err.message + ")"; }
+    }
+    ai.classList.remove("live");
+    ai.querySelector(".txt").textContent = reply || tx("উত্তর পাওয়া যায়নি।", "Keine Antwort.");
+    scrollDown($("convFeed")); scrollDown($("coachFeed"));
+    return reply;
+  })();
+  pendingChecks.push(p);
+  p.then(reply => { if (!active) return; if (reply) speakReply(reply); else resumeListening(); });
+}
+if (window.speechSynthesis) { try { speechSynthesis.getVoices(); } catch(e){} }
+
+/* ---------- Voice recording mode: record a turn, send the audio to Gemini ---------- */
+let audRec = false, audBusy = false, audChunks = [], audLen = 0, audT0 = 0, audCap = null;
+function wavB64(f32){
+  const pcm = floatToPcm16(f32), n = pcm.byteLength, h = new DataView(new ArrayBuffer(44));
+  const w = (o, str) => { for (let i=0;i<str.length;i++) h.setUint8(o+i, str.charCodeAt(i)); };
+  w(0,"RIFF"); h.setUint32(4,36+n,true); w(8,"WAVEfmt "); h.setUint32(16,16,true); h.setUint16(20,1,true); h.setUint16(22,1,true);
+  h.setUint32(24,16000,true); h.setUint32(28,32000,true); h.setUint16(32,2,true); h.setUint16(34,16,true); w(36,"data"); h.setUint32(40,n,true);
+  const out = new Uint8Array(44+n); out.set(new Uint8Array(h.buffer),0); out.set(new Uint8Array(pcm.buffer),44);
+  return b64FromBytes(out);
+}
+const AUDIO_EXTRA = {
+  heard:{type:"STRING"}, fluency_bn:{type:"STRING"}, pron_score:{type:"NUMBER"},
+  pron_issues:{type:"ARRAY", items:{type:"OBJECT", properties:{word:{type:"STRING"}, tip_bn:{type:"STRING"}}, required:["word","tip_bn"]}}
+};
+const AUDIO_COACH_SCHEMA = (() => { const c = JSON.parse(JSON.stringify(GRAMMAR_SCHEMA)); Object.assign(c.properties, AUDIO_EXTRA); c.required.push("heard","fluency_bn","pron_score","pron_issues"); return c; })();
+const REPLY_SCHEMA = {type:"OBJECT", properties:{heard:{type:"STRING"}, reply:{type:"STRING"}}, required:["heard","reply"]};
+function audioReplyPrompt(){
+  return convPrompt() + " The last user message is an audio recording of the learner. Return JSON: 'heard' is exactly what the learner said, word for word, without correcting it; " +
+    "'reply' is your spoken reply. The reply is spoken aloud, so use plain sentences with no markdown, lists or emojis.";
+}
+function audioCoachPrompt(){
+  return "You are a kind but exact German speaking coach for a Bengali-speaking learner at A1 level (Goethe A1, level: " + cfg.level + "). The input is an AUDIO recording of the learner answering a question; the text part gives the question. Work from what you actually hear.\n\n" +
+    "'heard': transcribe exactly what was said, word for word, keeping grammar mistakes, repeated words, restarts and fillers (äh, ähm). Do not correct this field. Empty string if there is no clear speech.\n\n" +
+    "Grammar part: the sentence to analyse is your own 'heard' transcript (it may be several sentences, treat it as one answer, and every 'wrong' must be copied exactly from 'heard').\n" + grammarPrompt() + "\n\n" +
+    "Pronunciation and fluency, judged from the audio itself, not from the text: 'pron_issues' lists up to three words that sounded clearly mispronounced or stressed wrongly, each with 'tip_bn', a short Bengali tip on how to say it (you may show the sound with simple German spelling); empty list if none. " +
+    "'pron_score' is a rough A1 pronunciation score from 0 to 100 (0 if the audio is too short to judge). " +
+    "'fluency_bn' is one or two Bengali sentences about pauses, fillers, restarts, speed and sentence length that you actually heard. Be honest that this is an estimate.";
+}
+function audBegin(){
+  if (!micCtx || audBusy) return;
+  try { window.speechSynthesis && speechSynthesis.cancel(); } catch(e){}
+  audChunks = []; audLen = 0; audRec = true; audT0 = Date.now();
+  $("micBtn").setAttribute("aria-pressed","true"); setMicLabel();
+  setStatus(tx("রেকর্ড হচ্ছে… শেষ হলে “থামান” চাপুন।", "Aufnahme läuft… Tippe auf „Stopp“, wenn du fertig bist."));
+  clearTimeout(audCap); audCap = setTimeout(() => { if (audRec) audSend(); }, 150000);
+  vizStart();
+}
+function audSend(){
+  audRec = false; clearTimeout(audCap); vizStop();
+  $("micBtn").setAttribute("aria-pressed","false");
+  if (audLen < 8000) { audChunks = []; audLen = 0; setMicLabel(); setStatus(tx("খুব ছোট রেকর্ড, আবার বলুন।", "Zu kurz, bitte noch einmal.")); return; }
+  const all = new Float32Array(audLen); let o = 0;
+  audChunks.forEach(c => { all.set(c, o); o += c.length; });
+  audChunks = []; audLen = 0;
+  audioTurn(wavB64(all));
+}
+function audStop(){
+  audRec = false; clearTimeout(audCap); audChunks = []; audLen = 0; vizStop();
+  $("micBtn").setAttribute("aria-pressed","false"); setMicLabel();
+  setStatus(tx("আপনার পালা। “কথা শুরু” চাপুন।", "Du bist dran. Tippe auf „Sprechen starten“."));
+}
+function audioToggle(){ if (audBusy) return; audRec ? audSend() : audBegin(); }
+function speakAudio(text){
+  const done = () => {
+    vizStop();
+    if (active && usingKind === "audio" && !audRec && !audBusy) setStatus(tx("আপনার পালা। “কথা শুরু” চাপুন।", "Du bist dran. Tippe auf „Sprechen starten“."));
+  };
+  if (!window.speechSynthesis) { done(); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text); const v = pickVoice();
+  if (v) { u.voice = v; u.lang = v.lang; } else u.lang = "de-DE";
+  u.onend = u.onerror = done;
+  setStatus(tx("বলছে…", "Spricht…"));
+  vizStart();
+  speechSynthesis.speak(u);
+}
+async function audioOpen(){
+  audBusy = true; setMicLabel(); setStatus(t("connecting"));
+  const ai = addBubble("ai"); ai.querySelector(".txt").textContent = "…";
+  let op = "";
+  try { op = (await callGeminiNow(convPrompt() + " Start the conversation now with one friendly opening question. Plain sentences, no markdown, lists or emojis.", "Begin.", null, 0.7)).trim(); }
+  catch (err) { setStatus(t("failed") + " (" + err.message + ")", true); }
+  ai.classList.remove("live"); ai.querySelector(".txt").textContent = op || "—";
+  audBusy = false; if (!active) return; setMicLabel();
+  if (op) { browserHist = [{role:"user", text:"(Start the conversation.)"}, {role:"model", text:op}]; speakAudio(op); }
+}
+function audioTurn(b64){
+  audBusy = true; setMicLabel(); setStatus(tx("শুনছে…", "Hört zu…"));
+  $("coachEmpty") && $("coachEmpty").remove();
+  const sess = curSession, last = (browserHist.filter(h => h.role === "model").pop() || {}).text || "";
+  const aud = {inlineData:{mimeType:"audio/wav", data:b64}};
+  const me = addBubble("me"); me.classList.remove("live"); me.querySelector(".txt").textContent = "🎙 …";
+  const ai = addBubble("ai"); ai.querySelector(".txt").textContent = "…";
+  const card = document.createElement("div"); card.className = "card";
+  card.innerHTML = '<span class="tag">' + esc(t("you")) + '</span><div class="pending">' + esc(t("checking")) + '</div>';
+  $("coachFeed").appendChild(card); scrollDown($("coachFeed"));
+  const item = {orig:"", at:Date.now(), r:null}; if (sess) sess.items.push(item);
+  const ctx = browserHist.map(h => ({role:h.role, parts:[{text:h.text}]})).concat([{role:"user", parts:[aud, {text:"(The learner's spoken answer is the audio above.)"}]}]);
+  /* coach and partner run at the same time, so the spoken reply does not wait for the long feedback */
+  pendingChecks.push((async () => {
+    try {
+      const r = JSON.parse(await callGemini(audioCoachPrompt(), [{role:"user", parts:[aud, {text:"The partner's last question was: " + last}]}], AUDIO_COACH_SCHEMA, 0.2));
+      if (!Array.isArray(r.mistakes)) r.mistakes = [];
+      const heard = String(r.heard || "").trim();
+      if (!heard) throw new Error(tx("স্পষ্ট কথা শোনা যায়নি", "keine deutliche Sprache gehört"));
+      delete r.heard; item.orig = heard; item.r = r; saveHist(); card.innerHTML = cardHTML(heard, r);
+    } catch (err) {
+      const pe = card.querySelector(".pending"); if (pe) { pe.className = "status err"; pe.textContent = t("gramfail") + " (" + err.message + ")"; }
+      if (sess) sess.items = sess.items.filter(i => i !== item);
+    }
+    scrollDown($("coachFeed"));
+  })());
+  (async () => {
+    let reply = "";
+    try {
+      const r = JSON.parse(await callGeminiNow(audioReplyPrompt(), ctx, REPLY_SCHEMA, 0.5));
+      const heard = String(r.heard || "").trim(); reply = String(r.reply || "").trim();
+      me.querySelector(".txt").textContent = heard || "—";
+      if (heard && reply) { browserHist.push({role:"user", text:heard}, {role:"model", text:reply}); if (browserHist.length > 16) browserHist = browserHist.slice(-16); }
+    } catch (err) { me.querySelector(".txt").textContent = "—"; setStatus(t("failed") + " (" + err.message + ")", true); }
+    ai.classList.remove("live"); ai.querySelector(".txt").textContent = reply || tx("উত্তর পাওয়া যায়নি।", "Keine Antwort.");
+    scrollDown($("convFeed"));
+    audBusy = false; if (!active) return; setMicLabel(); if (reply) speakAudio(reply);
+  })();
+}
+function switchToAudio(){
+  const old = ws; ws = null; try { old && old.close(); } catch(e){}
+  usingKind = "audio"; audBusy = false; audRec = false; setupDone = false;
+  showNotice(tx("Live ভয়েসের সীমা শেষ। রেকর্ড মোডে চলে গেছি।", "Live-Stimmen-Limit erreicht. In den Aufnahmemodus gewechselt."));
+  $("micBtn").setAttribute("aria-pressed","false"); setMicLabel(); audioOpen();
+}
+
+/* ---------- session control ---------- */
+function setMicLabel(){
+  const aud = active && usingKind === "audio";
+  $("endBtn").hidden = !aud;
+  $("stopRecBtn").hidden = !(aud && audRec);
+  const talking = active && (usingKind !== "audio" || audRec);
+  $("micLabel").textContent = audBusy ? tx("অপেক্ষা করুন…", "Bitte warten…") : (talking ? t("micStop") : t("micStart"));
+}
+function tick(){
+  const s = Math.floor((Date.now() - startedAt) / 1000);
+  $("timer").textContent = String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0");
+}
+async function startSession(){
+  if (!cfg.apiKey) { setStatus(t("nokey"), true); $("settings").open = true; $("apiKey").focus(); return; }
+  showNotice(""); setStatus(t("connecting"));
+  const kind = cfg.modelKind;
+  if (kind !== "browser") { try { await startMic(); } catch(e){ setStatus(t("nomic"), true); return; } }
+  if (kind !== "browser" && kind !== "audio") vizStart();
+  active = true; usingKind = kind; resumeHandle = null; retries = 0;
+  curSession = {id:Date.now().toString(36) + Math.random().toString(36).slice(2,6), start:Date.now(), end:0,
+    level:cfg.level, topic:cfg.topic, items:[], summary:null};
+  pendingChecks = [];
+  hist.sessions.push(curSession);
+  $("micBtn").setAttribute("aria-pressed", String(kind !== "audio")); setMicLabel();
+  startedAt = Date.now(); tick(); timerId = setInterval(tick, 1000);
+  $("settings").open = false;
+  if (kind === "browser") startBrowser(); else if (kind === "audio") audioOpen(); else openSocket();
+}
+/* ---------- auto-backup to Cloudflare after each session ---------- */
+const BACKUP_URL = "https://speakfix-deutsch-backup.aminuljoni180.workers.dev/backup";
+function uploadBackup(){
+  try {
+    if (!cfg.backupSecret) return;
+    const payload = JSON.stringify({secret: cfg.backupSecret, sessions: hist.sessions, review: rv});
+    if (payload.length > 900000) return;
+    fetch(BACKUP_URL, {method:"POST", headers:{"Content-Type":"application/json"}, body:payload}).catch(()=>{});
+  } catch(e){}
+}
+function stopSession(){
+  active = false; setupDone = false;
+  try { ws && ws.close(); } catch(e){}
+  ws = null; stopMic(); stopPlayback(); endTurn();
+  browserBusy = false; try { rec && rec.abort(); } catch(e){} rec = null; browserHist = [];
+  clearTimeout(audCap); audRec = false; audBusy = false; audChunks = []; audLen = 0;
+  try { window.speechSynthesis && speechSynthesis.cancel(); } catch(e){}
+  clearInterval(timerId);
+  $("micBtn").setAttribute("aria-pressed", "false"); setMicLabel();
+  const sess = curSession; curSession = null;
+  if (!sess) return;
+  sess.end = Date.now();
+  if (!sess.items.length) { hist.sessions = hist.sessions.filter(s => s !== sess); saveHist(); return; }
+  saveHist();
+  if (sess.items.length >= 3) makeReport(sess);
+  uploadBackup();
+}
+$("micBtn").addEventListener("click", () => {
+  if (!active) startSession();
+  else if (usingKind === "audio") audioToggle();
+  else { stopSession(); setStatus(""); }
+});
+$("endBtn").addEventListener("click", () => { stopSession(); setStatus(""); });
+$("stopRecBtn").addEventListener("click", audStop);
+
+/* ---------- progress view ---------- */
+function showView(name){
+  const prog = name === "progress";
+  $("viewPractice").hidden = prog; $("viewProgress").hidden = !prog;
+  $("viewPractice").style.display = prog ? "none" : "flex";
+  $("mPractice").classList.toggle("active", !prog);
+  $("mProgress").classList.toggle("active", prog);
+  if (prog) renderProgress();
+}
+/* ---------- hamburger menu ---------- */
+function closeMenu(){ $("menu").hidden = true; $("menuBtn").setAttribute("aria-expanded", "false"); }
+$("menuBtn").addEventListener("click", (e) => {
+  e.stopPropagation();
+  const m = $("menu"); m.hidden = !m.hidden;
+  $("menuBtn").setAttribute("aria-expanded", String(!m.hidden));
+});
+document.addEventListener("click", (e) => { if (!$("menu").hidden && !$("menu").contains(e.target)) closeMenu(); });
+$("mPractice").addEventListener("click", () => { showView("practice"); closeMenu(); });
+$("mProgress").addEventListener("click", () => { showView("progress"); closeMenu(); });
+$("mSettings").addEventListener("click", () => {
+  showView("practice"); closeMenu();
+  const s = $("settings"); s.open = true;
+  setTimeout(() => s.scrollIntoView({behavior:"smooth", block:"start"}), 50);
+});
+
+function renderOverview(){
+  const body = $("subBody");
+  const sessions = hist.sessions.filter(s => s.items && s.items.some(i => i.r));
+  if (!sessions.length) {
+    body.innerHTML = '<p class="empty" style="margin:20px auto">' + esc(tx("এখনও কোনো হিস্ট্রি নেই। একটা সেশন শেষ করলে এখানে আপনার অগ্রগতি দেখাবে।", "Noch kein Verlauf. Beende eine Sitzung, dann erscheint hier dein Fortschritt.")) + '</p>';
+    return;
+  }
+  const a = aggregate(sessions);
+  const acc = a.sentences ? Math.round(a.correct / a.sentences * 100) : 0;
+  const withBand = sessions.filter(s => s.summary && typeof s.summary.overall === "number");
+  const lastBand = withBand.length ? withBand[withBand.length-1].summary.overall : null;
+  let h = '';
+
+  h += '<section><div class="tiles">' +
+    '<div class="band"><b>' + a.sessions + '</b><span>' + esc(tx("সেশন", "Sitzungen")) + '</span></div>' +
+    '<div class="band"><b>' + a.sentences + '</b><span>' + esc(tx("বাক্য", "Sätze")) + '</span></div>' +
+    '<div class="band"><b>' + streakInfo().streak + '</b><span>' + esc(tx("দিনের ধারা", "Tage-Serie")) + '</span></div>' +
+    '<div class="band"><b>' + acc + '%</b><span>' + esc(tx("ভুলহীন বাক্য", "Fehlerfrei")) + '</span></div>' +
+    '<div class="band main"><b>' + (lastBand == null ? "–" : fmtPct(lastBand)) + '</b><span>' + esc(tx("সর্বশেষ অনুমান (লক্ষ্য: মজবুত A1)", "Neueste Einschätzung (Ziel: A1)")) + '</span></div>' +
+    '</div></section>';
+
+  const cats = Object.entries(a.cats).sort((x,y) => y[1]-x[1]);
+  h += '<section><h3>' + esc(tx("কোন দিকে বেশি দুর্বল", "Wo du am schwächsten bist")) + '</h3>';
+  if (cats.length) {
+    const max = cats[0][1];
+    h += '<p class="why" style="margin:0">' + esc(tx("সবচেয়ে বেশি ভুল: ", "Am häufigsten: ")) + '<b>' + esc(catLabel(cats[0][0])) + '</b> (' + cats[0][1] + tx(" বার", " Mal") + ')</p>';
+    h += '<div class="bars">' + cats.map(([c,n]) =>
+      '<div class="brow"><span>' + esc(catLabel(c)) + '</span><div class="btrack"><div class="bfill" style="width:' + Math.round(n / max * 100) + '%"></div></div><span class="num">' + n + '</span></div>').join("") + '</div>';
+  } else h += '<p class="why" style="margin:0">' + esc(tx("কোনো ভুল ধরা পড়েনি।", "Keine Fehler aufgezeichnet.")) + '</p>';
+  h += '</section>';
+
+  const rec = Object.values(a.rec).sort((x,y) => y.n - x.n).slice(0, 10);
+  if (rec.length) {
+    h += '<section><h3>' + esc(tx("যে ভুলগুলো বারবার হচ্ছে", "Fehler, die du wiederholst")) + '</h3><ul>' +
+      rec.map(r => '<li class="rec"><s>' + esc(r.wrong) + '</s> → <em>' + esc(r.right) + '</em><span class="chip">' + esc(catLabel(r.cat)) + '</span><span class="chip">×' + r.n + '</span></li>').join("") + '</ul></section>';
+  }
+
+  if (withBand.length) {
+    h += '<section><h3>' + esc(tx("A1 অনুমানের গতি", "Fortschritt der Einschätzung")) + '</h3><div class="bars">' +
+      withBand.slice(-10).map(s => '<div class="brow"><span>' + esc(fmtDate(s.start)) + '</span><div class="btrack"><div class="bfill ok" style="width:' + Math.round(s.summary.overall) + '%"></div></div><span class="num">' + fmtPct(s.summary.overall) + '</span></div>').join("") +
+      '</div><p class="hint" style="margin:0">' + esc(tx("৮০% মানে A1 ভালোভাবে আয়ত্ত হয়েছে। শুধু ৩টি মানদণ্ডের অনুমান।", "80 % bedeutet: A1 gut gemeistert. Schätzung aus 3 Kriterien.")) + '</p></section>';
+  }
+
+  const voc = Object.values(a.vocab).sort((x,y) => y.at - x.at).slice(0, 20);
+  if (voc.length) {
+    h += '<section><h3>' + esc(tx("A1 শব্দভান্ডার", "A1-Wortschatz")) + '</h3><div class="chips">' +
+      voc.map(v => '<span class="chip">' + esc(v.basic) + ' → <b>' + esc(v.better) + '</b></span>').join("") + '</div></section>';
+  }
+
+  h += '<section><h3>' + esc(tx("আমার জন্য স্টাডি প্ল্যান", "Lernplan für mich")) + '</h3>' +
+    '<div class="row"><button class="btn" id="planBtn" type="button">' + esc(tx("৭ দিনের প্ল্যান বানাও", "7-Tage-Plan erstellen")) + '</button></div>' +
+    '<div class="plan" id="planOut" hidden></div></section>';
+
+  h += '<section><h3>' + esc(tx("পুরনো সেশন", "Vergangene Sitzungen")) + '</h3>';
+  sessions.slice().reverse().slice(0, 30).forEach(s => {
+    const done = s.items.filter(i => i.r);
+    const ok = done.filter(i => i.r.correct).length;
+    const mins = s.end ? Math.max(1, Math.round((s.end - s.start) / 60000)) : null;
+    h += '<details class="sess"><summary><span>' + esc(fmtDate(s.start)) + (mins ? ' · ' + mins + tx(" মিনিট", " Min.") : '') + '</span><span>' +
+      done.length + tx(" বাক্য", " Sätze") + ' · ' + ok + tx(" ঠিক", " richtig") + (s.summary ? ' · ' + fmtPct(s.summary.overall) : '') + '</span></summary><div class="body">' +
+      (s.summary ? '<div class="report">' + reportHTML(s.summary) + '</div>' : '') +
+      done.slice(0, 60).map(i => '<div class="card">' + cardHTML(i.orig, i.r) + '</div>').join("") + '</div></details>';
+  });
+  h += '</section>';
+
+  body.innerHTML = h;
+  const pb = $("planBtn"); if (pb) pb.addEventListener("click", makePlan);
+}
+
+async function makePlan(){
+  const out = $("planOut"); out.hidden = false;
+  if (!cfg.apiKey) { out.textContent = t("nokey"); return; }
+  out.textContent = tx("প্ল্যান তৈরি হচ্ছে…", "Dein Plan wird erstellt…");
+  const sessions = hist.sessions.filter(s => s.items && s.items.some(i => i.r));
+  const a = aggregate(sessions);
+  const cats = Object.entries(a.cats).sort((x,y) => y[1]-x[1]).map(([c,n]) => (CAT[c] || CAT.other)[1] + ": " + n).join("; ");
+  const rec = Object.values(a.rec).sort((x,y) => y.n - x.n).slice(0, 8).map(r => r.wrong + " -> " + r.right + " (x" + r.n + ")").join("; ");
+  const bands = sessions.filter(s => s.summary).slice(-5).map(s => s.summary.overall).join(", ");
+  const user = "Sessions: " + a.sessions + ". Sentences: " + a.sentences + ". Error-free: " + a.correct + ". Error categories: " + cats + ". Repeated mistakes: " + rec + ". Recent A1 estimates (0-100): " + (bands || "none yet") + ".";
+  const sys = "You are a Goethe A1 German coach for a Bengali-speaking learner starting from zero. Write a realistic 7-day practice plan in Bengali (keep German terms and examples in German). " +
+    "Each day is about 20 minutes and uses spoken practice in this app (A1 topics like introducing yourself, family, home, food, free time, shopping), aimed at the weakest categories and repeated mistakes below. " +
+    "One short line for the goal and one for the exercise per day. No introduction, no closing remarks. Plain text, no markdown symbols.";
+  try { out.textContent = (await callGemini(sys, user, null, 0.5)).trim(); }
+  catch (err) { out.textContent = tx("প্ল্যান তৈরি হয়নি", "Plan fehlgeschlagen") + " (" + err.message + ")"; }
+}
+
+/* ---------- days, streak, goal ---------- */
+function dayKey(ms){ const d = new Date(ms); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+function dayLabel(key){
+  const p = key.split("-").map(Number); const dt = new Date(p[0], p[1]-1, p[2]);
+  try { return dt.toLocaleDateString(cfg.ui === "bn" ? "bn-BD" : "de-DE", {weekday:"long", day:"numeric", month:"long", year:"numeric"}); } catch(e){ return key; }
+}
+function groupByDay(){
+  const g = {};
+  hist.sessions.forEach(s => (s.items || []).forEach(it => { if (!it.r) return; const k = dayKey(it.at || s.start); (g[k] || (g[k] = [])).push(it); }));
+  return g;
+}
+function streakInfo(){
+  const g = groupByDay(); const d = new Date();
+  const today = (g[dayKey(d.getTime())] || []).length;
+  if (!today) d.setDate(d.getDate() - 1);
+  let n = 0;
+  while (g[dayKey(d.getTime())]) { n++; d.setDate(d.getDate() - 1); }
+  return {streak:n, today:today};
+}
+function renderGoal(){
+  const el = $("goalBar"); if (!el) return;
+  const si = streakInfo(); const goal = Number(cfg.goal) || 15;
+  const pct = Math.min(100, Math.round(si.today / goal * 100));
+  el.innerHTML = '<span>' + esc(tx("আজ", "Heute")) + ': <b class="num">' + si.today + '/' + goal + '</b> ' + esc(tx("বাক্য", "Sätze")) + '</span>' +
+    '<div class="btrack"><div class="bfill ok" style="width:' + pct + '%"></div></div>' +
+    '<span>' + (si.streak ? esc(si.streak + tx(" দিনের ধারা", "-Tage-Serie")) : esc(tx("আজ শুরু করুন", "Heute anfangen"))) + '</span>';
+}
+$("goal").addEventListener("change", renderGoal);
+
+function dayData(items){
+  const gm = {}, wd = {}, up = {};
+  items.forEach(it => {
+    const r = it.r;
+    (r.mistakes || []).forEach(m => {
+      if (!m.wrong) return;
+      const c = CAT[m.category] ? m.category : "other";
+      const store = c === "word_choice" ? wd : gm;
+      const k = (m.wrong + "|" + m.right).toLowerCase();
+      const e = store[k] || (store[k] = {wrong:m.wrong, right:m.right, cat:c, n:0, expl:"", ctx:it.orig});
+      e.n++; if (!e.expl) e.expl = m.why_bn || (c === "word_choice" ? "" : r.explanation_bn) || "";
+    });
+    (r.word_errors || []).forEach(w => {
+      if (!w.word) return;
+      const k = (w.word + "|" + w.correct_use).toLowerCase();
+      const e = wd[k] || (wd[k] = {wrong:w.word, right:w.correct_use, cat:"word_choice", n:0, expl:w.issue_bn || "", ctx:it.orig});
+      e.n++;
+    });
+    (r.vocab || []).forEach(v => { if (v && v.basic && v.better) up[v.basic.toLowerCase()] = v; });
+  });
+  const by = (a,b) => b.n - a.n;
+  return {n:items.length, ok:items.filter(i => i.r.correct).length, gm:Object.values(gm).sort(by), wd:Object.values(wd).sort(by), up:Object.values(up)};
+}
+function dayText(key, d){
+  let o = dayLabel(key) + "\n\n" + tx("গ্রামারের ভুল", "Grammatikfehler") + ":\n";
+  o += d.gm.length ? d.gm.map(e => "- " + e.wrong + " -> " + e.right + (e.expl ? " (" + e.expl + ")" : "")).join("\n") : "-";
+  o += "\n\n" + tx("শব্দের ভুল ব্যবহার", "Falsche Wortverwendung") + ":\n";
+  o += d.wd.length ? d.wd.map(e => "- " + e.wrong + " -> " + e.right + (e.expl ? " (" + e.expl + ")" : "")).join("\n") : "-";
+  if (d.up.length) o += "\n\n" + tx("আরও ভালো শব্দ", "Bessere Wörter") + ":\n" + d.up.map(v => "- " + v.basic + " -> " + v.better).join("\n");
+  return o;
+}
+function liHTML(e){
+  return '<li class="li2"><div class="rec"><s>' + esc(e.wrong) + '</s> → <em>' + esc(e.right) + '</em><span class="chip">' + esc(catLabel(e.cat)) + '</span>' + (e.n > 1 ? '<span class="chip">×' + e.n + '</span>' : '') + '</div>' +
+    (e.expl ? '<div class="small">' + esc(e.expl) + '</div>' : '') + '<div class="ctx">“' + esc(e.ctx) + '”</div></li>';
+}
+function renderDaily(){
+  const body = $("subBody"); const g = groupByDay(); const keys = Object.keys(g).sort().reverse();
+  if (!keys.length) { body.innerHTML = '<p class="empty" style="margin:20px auto">' + esc(tx("এখনও কোনো দিনের তালিকা নেই।", "Noch keine Tageslisten.")) + '</p>'; return; }
+  const todayKey = dayKey(Date.now());
+  body.innerHTML = keys.map(k => {
+    const d = dayData(g[k]); const acc = d.n ? Math.round(d.ok / d.n * 100) : 0;
+    return '<details class="sess"' + (k === todayKey || k === keys[0] ? ' open' : '') + '><summary><span>' + esc(dayLabel(k)) + '</span><span>' + d.n + esc(tx(" বাক্য", " Sätze")) + ' · ' + acc + '% · ' + (d.gm.length + d.wd.length) + esc(tx("টি ভুল", " Fehler")) + '</span></summary><div class="body">' +
+      '<div class="row"><button class="btn small copyDay" type="button" data-day="' + k + '">' + esc(tx("তালিকা কপি করুন", "Liste kopieren")) + '</button></div>' +
+      '<h3 style="font:600 15px var(--f-display);margin:0">' + esc(tx("গ্রামারের ভুল", "Grammatikfehler")) + ' (' + d.gm.length + ')</h3>' +
+      (d.gm.length ? '<ul class="plain">' + d.gm.map(liHTML).join("") + '</ul>' : '<p class="perfect" style="margin:0">' + esc(tx("আজ কোনো গ্রামারের ভুল নেই।", "Keine Grammatikfehler.")) + '</p>') +
+      '<h3 style="font:600 15px var(--f-display);margin:0">' + esc(tx("শব্দের ভুল ব্যবহার", "Falsch verwendete Wörter")) + ' (' + d.wd.length + ')</h3>' +
+      (d.wd.length ? '<ul class="plain">' + d.wd.map(liHTML).join("") + '</ul>' : '<p class="perfect" style="margin:0">' + esc(tx("কোনো শব্দ ভুল ব্যবহার হয়নি।", "Keine falsch verwendeten Wörter.")) + '</p>') +
+      (d.up.length ? '<h3 style="font:600 15px var(--f-display);margin:0">' + esc(tx("আরও ভালো শব্দ (A1)", "Bessere Wörter (A1)")) + '</h3><div class="chips">' + d.up.map(v => '<span class="chip">' + esc(v.basic) + ' → <b>' + esc(v.better) + '</b></span>').join("") + '</div>' : '') +
+      '</div></details>';
+  }).join("");
+  body.querySelectorAll(".copyDay").forEach(b => b.addEventListener("click", async () => {
+    const k = b.dataset.day; const txt = dayText(k, dayData(groupByDay()[k]));
+    try { await navigator.clipboard.writeText(txt); b.textContent = tx("কপি হয়েছে", "Kopiert"); }
+    catch(e){ b.textContent = tx("কপি হয়নি", "Kopieren fehlgeschlagen"); }
+  }));
+}
+
+/* ---------- review deck (spaced repetition) ---------- */
+const RKEY = "sprichfix_review";
+let rv = {cards:{}};
+try { const x = JSON.parse(localStorage.getItem(RKEY) || "null"); if (x && x.cards) rv = x; } catch(e){}
+function saveRv(){ try { localStorage.setItem(RKEY, JSON.stringify(rv)); } catch(e){} }
+const INTERVAL_DAYS = [0, 1, 3, 7, 14, 30];
+let rq = {active:false, list:[], i:0, shown:false, retried:{}};
+function syncCards(){
+  let changed = false;
+  hist.sessions.forEach(s => (s.items || []).forEach(it => {
+    if (!it.r) return;
+    (it.r.mistakes || []).forEach(m => {
+      if (!m.wrong || !m.right) return;
+      const k = "g|" + (m.wrong + "|" + m.right).toLowerCase();
+      if (!rv.cards[k]) { rv.cards[k] = {wrong:m.wrong, right:m.right, cat:CAT[m.category] ? m.category : "other", ctx:it.orig, expl:m.why_bn || (m.category === "word_choice" ? "" : it.r.explanation_bn) || "", kind:m.category === "word_choice" ? "word" : "grammar", box:0, due:0}; changed = true; }
+    });
+    (it.r.word_errors || []).forEach(w => {
+      if (!w.word || !w.correct_use) return;
+      const k = "w|" + (w.word + "|" + w.correct_use).toLowerCase();
+      if (!rv.cards[k]) { rv.cards[k] = {wrong:w.word, right:w.correct_use, cat:"word_choice", ctx:it.orig, expl:w.issue_bn || "", kind:"word", box:0, due:0}; changed = true; }
+    });
+  }));
+  if (changed) saveRv();
+}
+function dueCards(){ syncCards(); const now = Date.now(); return Object.keys(rv.cards).filter(k => rv.cards[k].due <= now).sort((a,b) => rv.cards[a].due - rv.cards[b].due); }
+function gradeCard(key, good){
+  const c = rv.cards[key]; if (!c) return;
+  c.box = good ? Math.min(5, c.box + 1) : 0;
+  c.due = Date.now() + (good ? INTERVAL_DAYS[c.box] : 1) * 86400000;
+  saveRv();
+  if (!good && !rq.retried[key]) { rq.retried[key] = true; rq.list.push(key); }
+}
+function renderReview(){
+  const body = $("subBody"); const due = dueCards(); const all = Object.values(rv.cards);
+  const seenS = new Set();
+  const dueUniq = due.filter(k => { const c = rv.cards[k]; const s = String((c && (c.ctx || c.wrong)) || "").toLowerCase(); if (!s || seenS.has(s)) return false; seenS.add(s); return true; });
+  if (!all.length) { body.innerHTML = '<p class="empty" style="margin:20px auto">' + esc(tx("রিভিউয়ের জন্য এখনও কোনো ভুল জমেনি।", "Noch keine Fehler zum Wiederholen.")) + '</p>'; return; }
+  if (!rq.active || rq.i >= rq.list.length) {
+    const done = rq.active && rq.i >= rq.list.length;
+    const mastered = all.filter(c => c.box >= 5).length;
+    body.innerHTML = '<section><h3>' + esc(tx("ভুল রিভিউ", "Wiederhole deine Fehler")) + '</h3>' +
+      (done ? '<p class="perfect" style="margin:0">' + esc(tx("আজকের রিভিউ শেষ। দারুণ!", "Wiederholung für heute fertig. Gut gemacht!")) + '</p>' : '') +
+      '<div class="tiles"><div class="band main"><b>' + due.length + '</b><span>' + esc(tx("এখন রিভিউ করার মতো", "Jetzt fällig")) + '</span></div>' +
+      '<div class="band"><b>' + all.length + '</b><span>' + esc(tx("মোট কার্ড", "Karten gesamt")) + '</span></div>' +
+      '<div class="band"><b>' + mastered + '</b><span>' + esc(tx("মনে থাকছে", "Gut gemerkt")) + '</span></div></div>' +
+      '<p class="hint" style="margin:0">' + esc(tx("আপনার নিজের ভুলগুলো কার্ড হয়ে জমে। ঠিক উত্তর মনে থাকলে কার্ডটা ১, ৩, ৭, ১৪, ৩০ দিন পরে ফিরে আসে। ভুলে গেলে পরদিন আবার আসে।", "Deine eigenen Fehler werden zu Karten. Wenn du die Antwort weißt, kommt die Karte nach 1, 3, 7, 14 und 30 Tagen zurück. Wenn du sie vergisst, kommt sie am nächsten Tag wieder.")) + '</p>' +
+      '<div class="row"><button class="btn tab" id="rvStart" type="button" aria-pressed="true"' + (dueUniq.length ? '' : ' disabled') + '>' + esc(dueUniq.length ? tx("রিভিউ শুরু (" + Math.min(20, dueUniq.length) + "টি)", "Wiederholung starten (" + Math.min(20, dueUniq.length) + ")") : tx("এখন কিছু বাকি নেই", "Nichts fällig")) + '</button></div></section>';
+    const st = $("rvStart"); if (st) st.addEventListener("click", () => { rq = {active:true, list:dueUniq.slice(0, 20), i:0, shown:false, retried:{}}; renderReview(); });
+    return;
+  }
+  const key = rq.list[rq.i]; const c = rv.cards[key];
+  const prompt = c.kind === "word"
+    ? tx("এই শব্দটা ভুলভাবে ব্যবহার হয়েছিল। সঠিক শব্দ বা ব্যবহার কী হবে?", "Dieses Wort wurde falsch verwendet. Wie lautet das richtige Wort oder die richtige Verwendung?")
+    : tx("এই বাক্যে ভুল ছিল। ঠিক অংশটা কী হবে?", "In diesem Satz war ein Fehler. Wie lautet die richtige Form?");
+  body.innerHTML = '<section><div class="tag">' + (rq.i + 1) + ' / ' + rq.list.length + ' · ' + esc(catLabel(c.cat)) + '</div>' +
+    '<div class="flash"><div class="small">' + esc(prompt) + '</div><div class="big">' + highlight(c.ctx || c.wrong, [{wrong:c.wrong}]) + '</div>' +
+    (rq.shown
+      ? '<div class="fix">✅ ' + esc(c.right) + '</div>' + (c.expl ? '<div class="why">' + esc(c.expl) + '</div>' : '') +
+        '<div class="row"><button class="btn" id="rvGood" type="button">' + esc(tx("মনে ছিল", "Ich wusste es")) + '</button><button class="btn danger" id="rvAgain" type="button">' + esc(tx("ভুলে গেছি", "Vergessen")) + '</button></div>'
+      : '<p class="hint" style="margin:0">' + esc(tx("আগে মুখে বলে দেখুন, তারপর উত্তর দেখুন।", "Sag es zuerst laut, dann prüfe.")) + '</p><div class="row"><button class="btn tab" id="rvShow" type="button" aria-pressed="true">' + esc(tx("উত্তর দেখুন", "Antwort zeigen")) + '</button></div>') +
+    '</div><div class="row" style="margin-top:8px"><button class="btn small" id="rvExit" type="button">' + esc(tx("বন্ধ করুন", "Wiederholung beenden")) + '</button></div></section>';
+  const bind = (id, fn) => { const el = $(id); if (el) el.addEventListener("click", fn); };
+  bind("rvShow", () => { rq.shown = true; renderReview(); });
+  bind("rvGood", () => { gradeCard(key, true); rq.i++; rq.shown = false; renderProgressTabs(); renderReview(); });
+  bind("rvAgain", () => { gradeCard(key, false); rq.i++; rq.shown = false; renderProgressTabs(); renderReview(); });
+  bind("rvExit", () => { rq.active = false; renderProgressTabs(); renderReview(); });
+}
+
+/* ---------- progress tabs ---------- */
+let progSub = "overview";
+function renderProgressTabs(){
+  const el = $("subTabs"); if (!el) return;
+  const due = dueCards().length;
+  const defs = [["overview", tx("সারসংক্ষেপ", "Überblick")], ["daily", tx("প্রতিদিনের তালিকা", "Tageslisten")], ["review", tx("রিভিউ", "Wiederholen") + (due ? " (" + due + ")" : "")]];
+  el.innerHTML = defs.map(d => '<button class="btn tab" type="button" data-sub="' + d[0] + '" aria-pressed="' + (progSub === d[0]) + '">' + esc(d[1]) + '</button>').join("");
+  el.querySelectorAll("button").forEach(b => b.addEventListener("click", () => { progSub = b.dataset.sub; renderProgress(); }));
+}
+function renderProgress(){
+  $("progBody").innerHTML = '<div class="row" id="subTabs"></div><div class="subbody" id="subBody"></div>';
+  renderProgressTabs();
+  if (progSub === "daily") renderDaily(); else if (progSub === "review") renderReview(); else renderOverview();
+}
+
+/* ---------- backup / restore / clear ---------- */
+function dataMsg(m){ $("dataMsg").textContent = m || ""; }
+$("exportBtn").addEventListener("click", () => {
+  try {
+    const blob = new Blob([JSON.stringify({sessions:hist.sessions, review:rv})], {type:"application/json"});
+    const url = URL.createObjectURL(blob); const a = document.createElement("a");
+    a.href = url; a.download = "sprich-fix-history-" + new Date().toISOString().slice(0,10) + ".json";
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+    dataMsg(tx("ডাউনলোড শুরু হয়েছে।", "Download gestartet."));
+  } catch(e){ dataMsg(tx("ডাউনলোড হয়নি।", "Download fehlgeschlagen.")); }
+});
+$("importBtn").addEventListener("click", () => $("importFile").click());
+$("importFile").addEventListener("change", async e => {
+  const f = e.target.files && e.target.files[0]; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    if (!data || !Array.isArray(data.sessions)) throw new Error("bad file");
+    const have = new Set(hist.sessions.map(s => s.id)); let added = 0;
+    data.sessions.forEach(s => { if (s && s.id && Array.isArray(s.items) && !have.has(s.id)) { hist.sessions.push(s); added++; } });
+    if (data.review && data.review.cards) Object.keys(data.review.cards).forEach(k => { if (!rv.cards[k]) rv.cards[k] = data.review.cards[k]; });
+    saveRv();
+    hist.sessions.sort((x,y) => x.start - y.start); saveHist(); renderProgress();
+    dataMsg(tx(added + "টি সেশন ফিরিয়ে আনা হয়েছে।", added + " Sitzungen wiederhergestellt."));
+  } catch(err){ dataMsg(tx("ফাইলটা পড়া যায়নি।", "Diese Datei konnte nicht gelesen werden.")); }
+  e.target.value = "";
+});
+let clearArmed = 0;
+$("clearBtn").addEventListener("click", () => {
+  if (Date.now() - clearArmed < 4000) {
+    hist = {sessions:[]}; saveHist(); rv = {cards:{}}; saveRv(); clearArmed = 0; renderProgress();
+    $("clearBtn").textContent = $("clearBtn").dataset[cfg.ui]; dataMsg(tx("সব হিস্ট্রি মুছে গেছে।", "Der gesamte Verlauf wurde gelöscht."));
+  } else {
+    clearArmed = Date.now();
+    $("clearBtn").textContent = tx("নিশ্চিত? আবার চাপুন", "Sicher? Erneut tippen");
+    setTimeout(() => { if (clearArmed) { clearArmed = 0; $("clearBtn").textContent = $("clearBtn").dataset[cfg.ui]; } }, 4000);
+  }
+});
+
+applyLang();
+</script>
+<script>
+if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol) && location.hostname !== "localhost") {
+  window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+}
+</script>
+</body>
+</html>
