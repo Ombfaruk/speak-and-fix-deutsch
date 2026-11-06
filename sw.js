@@ -1,7 +1,7 @@
 /* Sprich & Fix (mobile web) — service worker.
    Cache name MUST be bumped (v1 -> v2 -> v3 ...) every time index.html changes,
    otherwise phones keep showing the old version. */
-const CACHE = "sprich-fix-mobile-v1";
+const CACHE = "sprich-fix-mobile-v2";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {

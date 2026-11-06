@@ -149,10 +149,6 @@ mark{background:var(--bad-bg);color:var(--bad);border-radius:3px;padding:0 2px;f
 .brow{display:grid;grid-template-columns:minmax(100px,150px) 1fr 34px;gap:8px;align-items:center;font-size:14px}
 .rec{display:flex;gap:8px;flex-wrap:wrap;align-items:baseline;overflow-wrap:anywhere}
 .rec s{color:var(--bad)} .rec em{color:var(--good);font-style:normal;font-weight:700}
-.sess{border:2px solid var(--line);border-radius:12px;padding:10px 12px}
-.sess summary{cursor:pointer;display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;min-height:44px;align-items:center}
-.sess .body{display:flex;flex-direction:column;gap:10px;margin-top:10px}
-.plan{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px 12px}
 .row{display:flex;gap:8px;flex-wrap:wrap}
 .subbody{display:flex;flex-direction:column;gap:20px;min-width:0}
 .li2{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-top:2px solid var(--line)}
@@ -273,13 +269,10 @@ details.adv .grid{margin-top:12px}
   <div class="view" id="viewProgress" hidden>
     <div class="prog" id="progBody"></div>
     <div class="row" style="margin-top:12px">
-      <button class="btn" id="exportBtn" type="button" data-bn="হিস্ট্রি ডাউনলোড (backup)" data-de="Verlauf herunterladen (Backup)">Download history</button>
-      <button class="btn" id="importBtn" type="button" data-bn="Backup থেকে ফিরিয়ে আনুন" data-de="Aus Backup wiederherstellen">Restore</button>
-      <input id="importFile" type="file" accept="application/json,.json" hidden>
       <button class="btn danger" id="clearBtn" type="button" data-bn="সব হিস্ট্রি মুছুন" data-de="Gesamten Verlauf löschen">Delete all history</button>
     </div>
     <p class="hint" id="dataMsg"></p>
-    <p class="hint" data-bn="হিস্ট্রি এই ফোনেই সেভ থাকে। অন্য ফোন বা ব্রাউজারে নিতে হলে ডাউনলোড করে সেখানে ফিরিয়ে আনুন। ব্রাউজারের ডেটা মুছলে হিস্ট্রিও মুছে যাবে। Google দিয়ে সাইন ইন করলে অগ্রগতি ক্লাউডেও সিঙ্ক হয়।" data-de="Der Verlauf wird nur auf diesem Handy gespeichert. Um ihn auf ein anderes Handy oder einen anderen Browser zu übertragen, lade ihn herunter und stelle ihn dort wieder her. Wenn du die Browserdaten löschst, wird auch der Verlauf gelöscht. Wenn du dich mit Google anmeldest, wird dein Fortschritt auch in der Cloud synchronisiert.">History is saved on this phone only. To move it to another phone or browser, download it and restore it there. Clearing browser data deletes the history. Signing in with Google also syncs progress to the cloud.</p>
+    <p class="hint" data-bn="Google দিয়ে সাইন ইন থাকলে অগ্রগতি ক্লাউডে থাকে — যেকোনো ফোনেই ফিরে আসবে। সাইন ইন না থাকলে শুধু এই ফোনেই থাকে।" data-de="Wenn du mit Google angemeldet bist, liegt dein Fortschritt in der Cloud — er kommt auf jedem Handy zurück. Ohne Anmeldung bleibt er nur auf diesem Handy.">Signed in with Google, your progress lives in the cloud and comes back on any phone. Not signed in, it stays on this phone only.</p>
   </div>
 
   <div class="view" id="viewMemory" hidden>
@@ -378,11 +371,6 @@ details.adv .grid{margin-top:12px}
 
       <p class="hint" id="t-hint">Your key is stored only in this browser. Use headphones so the mic does not hear the voice.</p>
       <p class="hint" data-bn="ফ্রি key নিন: Google AI Studio (aistudio.google.com/apikey) থেকে। Key শুধু এই ফোনের ব্রাউজারে থাকে — কোডে বা ক্লাউডে যায় না।" data-de="Kostenloser Key: Google AI Studio (aistudio.google.com/apikey). Der Key bleibt nur in diesem Browser — er geht nicht in den Code oder in die Cloud.">Free key: Google AI Studio (aistudio.google.com/apikey). The key stays only in this browser — it never goes into the code or the cloud.</p>
-      <p class="hint" data-bn="অগ্রগতি এই ফোনেই থাকে। ব্যাকআপ নিতে Goal tab থেকে Export করুন।" data-de="Dein Fortschritt bleibt auf diesem Handy. Exportiere ein Backup über den Ziel-Tab.">Progress stays on this phone. Export a backup from the Goal tab.</p>
-      <div class="row">
-        <button class="btn" id="exportBtn2" type="button" data-bn="হিস্ট্রি ডাউনলোড (backup)" data-de="Verlauf herunterladen (Backup)">Download history</button>
-        <button class="btn" id="importBtn2" type="button" data-bn="Backup থেকে ফিরিয়ে আনুন" data-de="Aus Backup wiederherstellen">Restore</button>
-      </div>
     </div>
     <div class="sheet-foot"><button class="btn primary big" id="saveSettingsBtn" type="button" disabled data-bn="সেভ করুন" data-de="Speichern">Save</button></div>
   </div>
@@ -665,11 +653,11 @@ function endTurn(){
   userSpeechEndAt = 0;
 }
 
-/* ---------- Gemini text calls (grammar, report, plan) ---------- */
+/* ---------- Gemini text calls (grammar, report) ---------- */
 const FALLBACK_TEXT_MODEL = "gemini-3.5-flash-lite";
 let apiQueue = Promise.resolve();
 function callGemini(system, user, schema, temp, key){
-  /* queued calls (coach, report, plan) use the coach key if one is set */
+  /* queued calls (coach, report) use the coach key if one is set */
   const run = () => callGeminiNow(system, user, schema, temp, key || cfg.apiKey2 || cfg.apiKey);
   const p = apiQueue.then(run, run);
   apiQueue = p.catch(() => {});
@@ -1504,51 +1492,17 @@ function renderOverview(){
       voc.map(v => '<span class="chip">' + esc(v.basic) + ' → <b>' + esc(v.better) + '</b></span>').join("") + '</div></section>';
   }
 
-  h += '<section><h3>' + esc(tx("আমার জন্য স্টাডি প্ল্যান", "Lernplan für mich")) + '</h3>' +
-    '<div class="row"><button class="btn" id="planBtn" type="button">' + esc(tx("৭ দিনের প্ল্যান বানাও", "7-Tage-Plan erstellen")) + '</button></div>' +
-    '<div class="plan" id="planOut" hidden></div></section>';
-
-  h += '<section><h3>' + esc(tx("পুরনো সেশন", "Vergangene Sitzungen")) + '</h3>';
-  sessions.slice().reverse().slice(0, 30).forEach(s => {
-    const done = s.items.filter(i => i.r);
-    const ok = done.filter(i => i.r.correct).length;
-    const mins = s.end ? Math.max(1, Math.round((s.end - s.start) / 60000)) : null;
-    h += '<details class="sess"><summary><span>' + esc(fmtDate(s.start)) + (mins ? ' · ' + mins + tx(" মিনিট", " Min.") : '') + '</span><span>' +
-      done.length + tx(" বাক্য", " Sätze") + ' · ' + ok + tx(" ঠিক", " richtig") + (s.summary ? ' · ' + fmtPct(s.summary.overall) : '') + '</span></summary><div class="body">' +
-      (s.summary ? '<div class="report">' + reportHTML(s.summary) + '</div>' : '') +
-      done.slice(0, 60).map(i => '<div class="card">' + cardHTML(i.orig, i.r) + '</div>').join("") + '</div></details>';
-  });
-  h += '</section>';
-
   h += '<section><h3>' + esc(tx("আমার অগ্রগতি নিয়ে জিজ্ঞেস করুন", "Frag mich zu deinem Fortschritt")) + '</h3>' +
     '<p class="hint" style="margin:0">' + esc(tx("যেমন: “আমার দুর্বলতা কী?” — শুধু এই প্রশ্নের উত্তর দিতেই আপনার অগ্রগতির তথ্য Gemini-কে পাঠানো হয়।", "Zum Beispiel: „Was ist meine Schwäche?“ — Deine Fortschrittsdaten werden nur zur Beantwortung dieser Frage an Gemini geschickt.")) + '</p>' +
     '<div class="chat-feed">' + progChat.map(m => '<div class="msg ' + (m.role === "user" ? "me" : "ai") + '"><span class="txt">' + esc(m.text) + '</span></div>').join("") + '</div>' +
     '<div class="composer"><input id="progChatInput" inputmode="text" enterkeyhint="send" placeholder="' + esc(tx("প্রশ্ন লিখুন…", "Frage schreiben…")) + '" autocomplete="off"><button class="btn primary" id="progChatSend" type="button">' + esc(tx("পাঠান", "Senden")) + '</button></div></section>';
   body.innerHTML = h;
-  const pb = $("planBtn"); if (pb) pb.addEventListener("click", makePlan);
   const pcs = $("progChatSend"), pci = $("progChatInput");
   if (pcs && pci) {
     const sendQ = () => { const q = pci.value.trim(); if (!q) return; pci.value = ""; askProgress(q); };
     pcs.addEventListener("click", sendQ);
     pci.addEventListener("keydown", e => { if (e.key === "Enter") sendQ(); });
   }
-}
-
-async function makePlan(){
-  const out = $("planOut"); out.hidden = false;
-  if (!cfg.apiKey) { out.textContent = t("nokey"); return; }
-  out.textContent = tx("প্ল্যান তৈরি হচ্ছে…", "Dein Plan wird erstellt…");
-  const sessions = hist.sessions.filter(s => s.items && s.items.some(i => i.r));
-  const a = aggregate(sessions);
-  const cats = Object.entries(a.cats).sort((x,y) => y[1]-x[1]).map(([c,n]) => (CAT[c] || CAT.other)[1] + ": " + n).join("; ");
-  const rec = Object.values(a.rec).sort((x,y) => y.n - x.n).slice(0, 8).map(r => r.wrong + " -> " + r.right + " (x" + r.n + ")").join("; ");
-  const bands = sessions.filter(s => s.summary).slice(-5).map(s => s.summary.overall).join(", ");
-  const user = "Sessions: " + a.sessions + ". Sentences: " + a.sentences + ". Error-free: " + a.correct + ". Error categories: " + cats + ". Repeated mistakes: " + rec + ". Recent A1 estimates (0-100): " + (bands || "none yet") + ".";
-  const sys = "You are a Goethe A1 German coach for a Bengali-speaking learner starting from zero. Write a realistic 7-day practice plan in Bengali (keep German terms and examples in German). " +
-    "Each day is about 20 minutes and uses spoken practice in this app (A1 topics like introducing yourself, family, home, food, free time, shopping), aimed at the weakest categories and repeated mistakes below. " +
-    "One short line for the goal and one for the exercise per day. No introduction, no closing remarks. Plain text, no markdown symbols.";
-  try { out.textContent = (await callGemini(sys, user, null, 0.5)).trim(); }
-  catch (err) { out.textContent = tx("প্ল্যান তৈরি হয়নি", "Plan fehlgeschlagen") + " (" + err.message + ")"; }
 }
 
 /* ---------- days, streak, goal ---------- */
@@ -1720,32 +1674,8 @@ function renderProgress(){
   if (progSub === "daily") renderDaily(); else if (progSub === "review") renderReview(); else renderOverview();
 }
 
-/* ---------- backup / restore / clear ---------- */
+/* ---------- clear history ---------- */
 function dataMsg(m){ $("dataMsg").textContent = m || ""; }
-$("exportBtn").addEventListener("click", () => {
-  try {
-    const blob = new Blob([JSON.stringify({sessions:hist.sessions, review:rv})], {type:"application/json"});
-    const url = URL.createObjectURL(blob); const a = document.createElement("a");
-    a.href = url; a.download = "sprich-fix-history-" + new Date().toISOString().slice(0,10) + ".json";
-    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
-    dataMsg(tx("ডাউনলোড শুরু হয়েছে।", "Download gestartet."));
-  } catch(e){ dataMsg(tx("ডাউনলোড হয়নি।", "Download fehlgeschlagen.")); }
-});
-$("importBtn").addEventListener("click", () => $("importFile").click());
-$("importFile").addEventListener("change", async e => {
-  const f = e.target.files && e.target.files[0]; if (!f) return;
-  try {
-    const data = JSON.parse(await f.text());
-    if (!data || !Array.isArray(data.sessions)) throw new Error("bad file");
-    const have = new Set(hist.sessions.map(s => s.id)); let added = 0;
-    data.sessions.forEach(s => { if (s && s.id && Array.isArray(s.items) && !have.has(s.id)) { hist.sessions.push(s); added++; } });
-    if (data.review && data.review.cards) Object.keys(data.review.cards).forEach(k => { if (!rv.cards[k]) rv.cards[k] = data.review.cards[k]; });
-    saveRv();
-    hist.sessions.sort((x,y) => x.start - y.start); saveHist(); renderProgress();
-    dataMsg(tx(added + "টি সেশন ফিরিয়ে আনা হয়েছে।", added + " Sitzungen wiederhergestellt."));
-  } catch(err){ dataMsg(tx("ফাইলটা পড়া যায়নি।", "Diese Datei konnte nicht gelesen werden.")); }
-  e.target.value = "";
-});
 let clearArmed = 0;
 $("clearBtn").addEventListener("click", () => {
   if (Date.now() - clearArmed < 4000) {
@@ -1990,8 +1920,6 @@ $("lessonClose").addEventListener("click", () => {
 });
 $("saveSettingsBtn").addEventListener("click", saveSettings);
 $("settingsClose").addEventListener("click", () => closeSettingsSheet(true));
-$("exportBtn2").addEventListener("click", () => $("exportBtn").click());
-$("importBtn2").addEventListener("click", () => $("importFile").click());
 (function(){
   try {
     const dismissed = localStorage.getItem("sprichfix_install_dismissed") === "1";
