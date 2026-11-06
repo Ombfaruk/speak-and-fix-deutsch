@@ -185,6 +185,15 @@ ul.plain{list-style:none;padding:0;margin:0}
 .auth-card{border:2px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
 .auth-card .who-line{font-size:15px;font-weight:700;overflow-wrap:anywhere}
 .sync-line{font-size:13px;color:var(--muted)}
+/* sign-in gate: the whole app stays behind sign-in — nobody uses it signed out */
+.gate{position:fixed;inset:0;z-index:90;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
+.gate[hidden]{display:none}
+.gate-card{width:100%;max-width:420px;display:flex;flex-direction:column;gap:14px;text-align:center;align-items:center}
+.gate-card .gate-logo{font-size:44px;line-height:1}
+.gate-card h1{font-size:28px;font-weight:800;margin:0}
+.gate-card p{font-size:16px;line-height:1.5;margin:0;color:var(--fg)}
+.gate-card .btn.big{width:100%}
+.gate-card .sync-line{min-height:18px}
 label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--muted);min-width:0}
 label.f input,label.f select{background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:12px;color:var(--fg);min-width:0;width:100%;font-size:16px}
 details.adv{border:2px solid var(--line);border-radius:16px;padding:12px 14px}
@@ -209,6 +218,16 @@ details.adv .grid{margin-top:12px}
 </head>
 
 <body>
+<div class="gate" id="gate" hidden>
+  <div class="gate-card">
+    <div class="gate-logo">🎙</div>
+    <h1>Sprich &amp; Fix</h1>
+    <p data-bn="জার্মান বলা অনুশীলন করতে প্রথমে Google দিয়ে সাইন ইন করুন। প্রত্যেকের নিজের অ্যাকাউন্ট — আপনার অগ্রগতি শুধু আপনারই থাকবে, আর API key-ও আপনি নিজে বসাবেন।" data-de="Melde dich zuerst mit Google an, um Deutsch zu üben. Jeder hat sein eigenes Konto — dein Fortschritt bleibt nur deiner, und den API-Key trägst du selbst ein.">Sign in with Google first to practise speaking German. Everyone has their own account — your progress stays yours, and you set your own API key.</p>
+    <button class="btn primary big googleSignInBtn" type="button" data-bn="Google দিয়ে সাইন ইন করুন" data-de="Mit Google anmelden">Sign in with Google</button>
+    <div class="sync-line syncStatus"></div>
+    <p class="hint" data-bn="সাইন ইন না হলে লিংকটা Safari-তে খুলে চেষ্টা করুন।" data-de="Wenn die Anmeldung nicht klappt, öffne den Link in Safari.">If sign-in fails, open the link in Safari and try again.</p>
+  </div>
+</div>
 <div class="app">
   <header class="topbar">
     <h1 id="t-title">Sprich &amp; Fix</h1>
@@ -272,7 +291,7 @@ details.adv .grid{margin-top:12px}
       <button class="btn danger" id="clearBtn" type="button" data-bn="সব হিস্ট্রি মুছুন" data-de="Gesamten Verlauf löschen">Delete all history</button>
     </div>
     <p class="hint" id="dataMsg"></p>
-    <p class="hint" data-bn="Google দিয়ে সাইন ইন থাকলে অগ্রগতি ক্লাউডে থাকে — যেকোনো ফোনেই ফিরে আসবে। সাইন ইন না থাকলে শুধু এই ফোনেই থাকে।" data-de="Wenn du mit Google angemeldet bist, liegt dein Fortschritt in der Cloud — er kommt auf jedem Handy zurück. Ohne Anmeldung bleibt er nur auf diesem Handy.">Signed in with Google, your progress lives in the cloud and comes back on any phone. Not signed in, it stays on this phone only.</p>
+    <p class="hint" data-bn="Google দিয়ে সাইন ইন থাকলে অগ্রগতি ক্লাউডে থাকে — যেকোনো ফোনেই ফিরে আসবে। সাইন ইন ছাড়া অ্যাপ ব্যবহার করা যায় না।" data-de="Wenn du mit Google angemeldet bist, liegt dein Fortschritt in der Cloud — er kommt auf jedem Handy zurück. Ohne Anmeldung kann die App nicht benutzt werden.">Signed in with Google, your progress lives in the cloud and comes back on any phone. The app needs sign-in to use.</p>
   </div>
 
   <div class="view" id="viewMemory" hidden>
@@ -302,9 +321,9 @@ details.adv .grid{margin-top:12px}
         </label>
         <label class="f" for="modelKind"><span id="t-voicemodel">Voice model</span>
           <select id="modelKind">
-            <option value="audio" data-bn="রেকর্ড মোড (Gemini আপনার কণ্ঠ শুনে উচ্চারণসহ কোচিং দেয়)" data-de="Sprachaufnahme (Gemini hört dich und coacht auch die Aussprache)">Voice recording</option>
-            <option value="standard" id="o-std">Standard Live (longer sessions)</option>
             <option value="native" id="o-nat">Native audio (most natural)</option>
+            <option value="standard" id="o-std">Standard Live (longer sessions)</option>
+            <option value="audio" data-bn="রেকর্ড মোড (Gemini আপনার কণ্ঠ শুনে উচ্চারণসহ কোচিং দেয়)" data-de="Sprachaufnahme (Gemini hört dich und coacht auch die Aussprache)">Voice recording</option>
             <option value="browser" data-bn="Chrome ভয়েস (ফ্রি, প্রতি বাক্যে ১টি রিকোয়েস্ট)" data-de="Chrome-Stimme (kostenlos, 1 Anfrage pro Runde)">Chrome voice (free, 1 request per turn)</option>
           </select>
         </label>
@@ -417,15 +436,19 @@ const CAT_IDS = Object.keys(CAT);
 /* ---------- settings ---------- */
 const $ = id => document.getElementById(id);
 const DEFAULTS = {
-  apiKey:"", apiKey2:"", modelKind:"audio", voice:"Puck", level:"A1", topic:"sich vorstellen", fallback:"1", focus:"1", goal:"15",
-  mStd:"gemini-3.8-live", mNat:"gemini-3.1-flash-live-preview", mGram:"gemini-3.8-flash",
+  apiKey:"", apiKey2:"", modelKind:"standard", voice:"Puck", level:"A1", topic:"sich vorstellen", fallback:"1", focus:"1", goal:"15",
+  mStd:"gemini-3.8-live", mNat:"gemini-3.8-live", mGram:"gemini-3.8-flash",
   ui:"bn", theme:""
 };
 let cfg = Object.assign({}, DEFAULTS);
 try { Object.assign(cfg, JSON.parse(localStorage.getItem("sprichfix") || "{}")); } catch(e){}
 if (cfg.mStd === "gemini-live-2.5-flash-preview") cfg.mStd = DEFAULTS.mStd;
 if (cfg.mNat === "gemini-2.5-flash-native-audio-preview-09-2025") cfg.mNat = DEFAULTS.mNat;
+/* gemini-3.1-flash-live-preview shuts down 17 Nov 2026 — move saved values to gemini-3.8-live. */
+if (cfg.mNat === "gemini-3.1-flash-live-preview") cfg.mNat = DEFAULTS.mNat;
 if (cfg.mGram === "gemini-2.5-flash") cfg.mGram = DEFAULTS.mGram;
+/* Record mode answers in 3-8s; Live answers in ~1s. Move saved record-mode users to Live. */
+if (cfg.modelKind === "audio") cfg.modelKind = DEFAULTS.modelKind;
 function saveCfg(){ try { localStorage.setItem("sprichfix", JSON.stringify(cfg)); } catch(e){} }
 
 /* ---- Settings draft: edits are staged, nothing applies until Save ---- */
@@ -452,6 +475,7 @@ function saveSettings(){
   if (!settingsDirty) return;
   Object.assign(cfg, draft);
   saveCfg();
+  warmLive();
   applyLang();
   markSettingsDirty(false);
   const b = $("saveSettingsBtn");
@@ -463,8 +487,8 @@ function saveSettings(){
 const LIVE_MODELS = [
   ["gemini-3.8-live","Gemini 3.8 Live (stable)"],
   ["gemini-3.8-live-extended-thinking","Gemini 3.8 Live Extended Thinking (stable)"],
-  ["gemini-3.1-flash-live-preview","Gemini 3.1 Flash Live (preview, legacy)"],
-  ["gemini-2.5-flash-native-audio-preview-12-2025","Gemini 2.5 Flash native audio (past users only)"]
+  ["gemini-3.1-flash-live-preview","Gemini 3.1 Flash Live (ends 17 Nov 2026 — use 3.8 Live)"],
+  ["gemini-2.5-flash-native-audio-preview-12-2025","Gemini 2.5 Flash native audio (ends 17 Nov 2026)"]
 ];
 const TEXT_MODELS = [
   ["gemini-3.8-flash","Gemini 3.8 Flash (stable, recommended)"],
@@ -530,6 +554,27 @@ setThemeLabel();
 /* ---------- helpers ---------- */
 function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function setStatus(msg, isErr){ const s=$("status"); s.textContent = msg || ""; s.classList.toggle("err", !!isErr); }
+/* Friendly error text: never show raw "HTTP 404 ..." or API JSON to the user.
+   The raw detail goes to the console only, for debugging. */
+function friendlyErr(err){
+  const m = String((err && err.message) || err || "");
+  try { console.warn("api error:", m.slice(0, 200)); } catch(e){}
+  if (/HTTP 400|HTTP 403|API key not valid|API_KEY_INVALID/i.test(m)) return tx("API key-টা ঠিক নয় — Settings-এ সঠিক key দিন।", "Der API-Key stimmt nicht — bitte trage den richtigen Key in den Einstellungen ein.");
+  if (/HTTP 404|NOT_FOUND|not found/i.test(m)) return tx("মডেলটা পাওয়া যাচ্ছে না — Settings → মডেল বাছাই থেকে আরেকটা বেছে নিন।", "Das Modell wurde nicht gefunden — wähle in den Einstellungen ein anderes Modell.");
+  if (/HTTP 429|quota|exhaust|rate limit|rate_limit/i.test(m)) return tx("আজকের সীমা শেষ — একটু পরে আবার চেষ্টা করুন।", "Tageslimit erreicht — versuche es später erneut.");
+  if (/network error|Failed to fetch|NetworkError|network-request-failed/i.test(m)) return tx("ইন্টারনেট সমস্যা — সংযোগ চেক করে আবার চেষ্টা করুন।", "Netzwerkproblem — prüfe deine Verbindung und versuche es erneut.");
+  if (/HTTP 5\d\d/i.test(m)) return tx("সার্ভার সমস্যা — একটু পরে আবার চেষ্টা করুন।", "Serverproblem — versuche es später erneut.");
+  return tx("কিছু একটা হয়নি — আবার চেষ্টা করুন।", "Etwas ist schiefgelaufen — versuche es erneut.");
+}
+function friendlyAuthErr(e){
+  const c = String((e && e.code) || "");
+  const m = String((e && e.message) || e || "");
+  try { console.warn("sign-in error:", c, m.slice(0, 200)); } catch(err){}
+  if (/auth\/unauthorized-domain/i.test(c)) return tx("এই লিংক থেকে সাইন ইন হচ্ছে না — লিংকটা Safari-তে খুলে চেষ্টা করুন।", "Anmeldung von diesem Link aus nicht möglich — bitte öffne den Link in Safari.");
+  if (/auth\/popup-blocked|auth\/popup-closed-by-user|auth\/cancelled-popup-request/i.test(c)) return tx("সাইন ইন বন্ধ হয়ে গেছে — আবার চাপুন।", "Anmeldung abgebrochen — bitte erneut tippen.");
+  if (/auth\/network-request-failed|network/i.test(c + " " + m)) return tx("ইন্টারনেট সমস্যা — সংযোগ চেক করে আবার চেষ্টা করুন।", "Netzwerkproblem — prüfe deine Verbindung und versuche es erneut.");
+  return tx("সাইন ইন হয়নি — আবার চেষ্টা করুন।", "Anmeldung fehlgeschlagen — bitte erneut versuchen.");
+}
 function showNotice(msg){ const n=$("notice"); n.textContent=msg; n.hidden=!msg; }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function b64FromBytes(bytes){
@@ -784,7 +829,7 @@ function checkGrammar(sentence){
       card.innerHTML = cardHTML(sentence, r);
     } catch (err) {
       const pe = card.querySelector(".pending");
-      if (pe) { pe.className = "status err"; pe.textContent = t("gramfail") + " (" + err.message + ")"; }
+      if (pe) { pe.className = "status err"; pe.textContent = friendlyErr(err); }
     }
     scrollDown($("coachFeed"));
   })();
@@ -843,7 +888,7 @@ async function makeReport(sess){
     sess.summary = s; saveHist();
     card.innerHTML = reportHTML(s);
   } catch (err) {
-    card.innerHTML = '<div class="status err">' + esc(tx("রিপোর্ট তৈরি হয়নি", "Bericht fehlgeschlagen")) + " (" + esc(err.message) + ")</div>";
+    card.innerHTML = '<div class="status err">' + esc(tx("রিপোর্ট তৈরি হয়নি", "Bericht fehlgeschlagen")) + ": " + esc(friendlyErr(err)) + "</div>";
   }
   scrollDown($("coachFeed"));
 }
@@ -1036,6 +1081,21 @@ function stopPlayback(){
 /* ---------- Gemini Live socket ---------- */
 let ws = null, active = false, setupDone = false, resumeHandle = null, retries = 0, usingKind = "standard";
 let startedAt = 0, timerId = null;
+let warming = false, warmTimer = 0;
+function warmLive(){
+  /* Pre-connect the Live socket while the user is on the Speaking tab, so the
+     first tap answers fast (setup is already done before they speak).
+     An idle warmed socket closes after 2 minutes. Never warms without
+     sign-in + API key, and never for the slow record/Chrome modes. */
+  if (active || ws || !cfg.apiKey) return;
+  const kind = cfg.modelKind;
+  if (kind !== "native" && kind !== "standard") return;
+  if (!window.FirebaseSync || !window.FirebaseSync.user) return;
+  warming = true; usingKind = kind; resumeHandle = null; retries = 0;
+  openSocket();
+  clearTimeout(warmTimer);
+  warmTimer = setTimeout(() => { if (!active && ws) { try { ws.close(); } catch(e){} } }, 120000);
+}
 
 function convPrompt(){
   let p = "You are a friendly German conversation partner for a Bengali-speaking learner at A1 level (Goethe A1, complete beginner). Learner level: " + cfg.level + ". Topic: " + cfg.topic + ". " +
@@ -1079,7 +1139,7 @@ function openSocket(){
 
 function handleMsg(msg){
   if (msg.setupComplete !== undefined) {
-    setupDone = true; retries = 0; setStatus(t("live"));
+    setupDone = true; retries = 0; if (active) setStatus(t("live"));
     return;
   }
   if (msg.sessionResumptionUpdate && msg.sessionResumptionUpdate.newHandle) resumeHandle = msg.sessionResumptionUpdate.newHandle;
@@ -1096,7 +1156,7 @@ function handleMsg(msg){
 }
 
 function onSocketClosed(ev){
-  if (!active) return;
+  if (!active) { ws = null; warming = false; return; }
   const reason = (ev.reason || "").toString();
   const quota = /quota|exhaust|limit|429|rate/i.test(reason);
   if (usingKind === "native" && cfg.fallback === "1" && (!setupDone || quota)) {
@@ -1105,12 +1165,12 @@ function onSocketClosed(ev){
   }
   if (usingKind === "standard" && cfg.fallback === "1" && quota) { switchToAudio(); return; }
   if (!setupDone && !resumeHandle) {
-    stopSession(); setStatus(t("failed") + (reason ? ": " + reason : " (code " + ev.code + ")"), true); return;
+    stopSession(); setStatus(friendlyErr(reason || ("code " + ev.code)), true); return;
   }
   if (retries < 5) {
     retries++; setStatus(t("reconnecting")); setTimeout(() => { if (active) openSocket(); }, 600 * retries);
   } else {
-    stopSession(); setStatus(t("failed") + (reason ? ": " + reason : ""), true);
+    stopSession(); setStatus(friendlyErr(reason || "failed"), true);
   }
 }
 
@@ -1201,7 +1261,7 @@ function browserTurn(sentence){
       if (browserHist.length > 16) browserHist = browserHist.slice(-16);
     } catch (err) {
       const pe = card.querySelector(".pending");
-      if (pe) { pe.className = "status err"; pe.textContent = t("gramfail") + " (" + err.message + ")"; }
+      if (pe) { pe.className = "status err"; pe.textContent = friendlyErr(err); }
     }
     ai.classList.remove("live");
     ai.querySelector(".txt").textContent = reply || tx("উত্তর পাওয়া যায়নি।", "Keine Antwort.");
@@ -1284,7 +1344,7 @@ async function audioOpen(){
   const ai = addBubble("ai"); ai.querySelector(".txt").textContent = "…";
   let op = "";
   try { op = (await callGeminiNow(convPrompt() + " Start the conversation now with one friendly opening question. Plain sentences, no markdown, lists or emojis.", "Begin.", null, 0.7)).trim(); }
-  catch (err) { setStatus(t("failed") + " (" + err.message + ")", true); }
+  catch (err) { setStatus(friendlyErr(err), true); }
   ai.classList.remove("live"); ai.querySelector(".txt").textContent = op || "—";
   audBusy = false; if (!active) return; setMicLabel();
   if (op) { browserHist = [{role:"user", text:"(Start the conversation.)"}, {role:"model", text:op}]; speakAudio(op); }
@@ -1311,7 +1371,7 @@ function audioTurn(b64){
       if (!heard) throw new Error(tx("স্পষ্ট কথা শোনা যায়নি", "keine deutliche Sprache gehört"));
       delete r.heard; item.orig = heard; item.r = r; saveHist(); card.innerHTML = cardHTML(heard, r);
     } catch (err) {
-      const pe = card.querySelector(".pending"); if (pe) { pe.className = "status err"; pe.textContent = t("gramfail") + " (" + err.message + ")"; }
+      const pe = card.querySelector(".pending"); if (pe) { pe.className = "status err"; pe.textContent = friendlyErr(err); }
       if (sess) sess.items = sess.items.filter(i => i !== item);
     }
     scrollDown($("coachFeed"));
@@ -1323,7 +1383,7 @@ function audioTurn(b64){
       const heard = String(r.heard || "").trim(); reply = String(r.reply || "").trim();
       me.querySelector(".txt").textContent = heard || "—";
       if (heard && reply) { browserHist.push({role:"user", text:heard}, {role:"model", text:reply}); if (browserHist.length > 16) browserHist = browserHist.slice(-16); }
-    } catch (err) { me.querySelector(".txt").textContent = "—"; setStatus(t("failed") + " (" + err.message + ")", true); }
+    } catch (err) { me.querySelector(".txt").textContent = "—"; setStatus(friendlyErr(err), true); }
     ai.classList.remove("live"); ai.querySelector(".txt").textContent = reply || tx("উত্তর পাওয়া যায়নি।", "Keine Antwort.");
     scrollDown($("convFeed"));
     if (reply) { lastLatency = (Date.now() - t0) / 1000; showLatency(); }
@@ -1354,6 +1414,7 @@ async function startSession(){
   if (!cfg.apiKey) { setStatus(t("nokey"), true); openSettingsSheet(); $("apiKey").focus(); return; }
   showNotice(""); setStatus(t("connecting"));
   const kind = cfg.modelKind;
+  const reuseWarm = (kind === "native" || kind === "standard") && warming && ws && setupDone && usingKind === kind;
   if (kind !== "browser") { try { await startMic(); } catch(e){ setStatus(t("nomic"), true); return; } }
   if (kind !== "browser" && kind !== "audio") vizStart();
   active = true; usingKind = kind; resumeHandle = null; retries = 0;
@@ -1364,7 +1425,9 @@ async function startSession(){
   $("micBtn").setAttribute("aria-pressed", String(kind !== "audio")); setMicLabel();
   startedAt = Date.now(); tick(); timerId = setInterval(tick, 1000);
   closeSettingsSheet();
-  if (kind === "browser") startBrowser(); else if (kind === "audio") audioOpen(); else openSocket();
+  if (kind === "browser") startBrowser(); else if (kind === "audio") audioOpen();
+  else if (reuseWarm) { warming = false; clearTimeout(warmTimer); setStatus(t("live")); }
+  else { warming = false; openSocket(); }
 }
 function stopSession(){
   active = false; setupDone = false;
@@ -1401,6 +1464,7 @@ function showView(name){
   document.querySelectorAll(".tabbtn").forEach(b => b.classList.toggle("on", b.dataset.view === name));
   if (name === "progress") { renderProgress(); fbPushSoon(); }
   if (name === "memory") renderMemory();
+  if (name === "practice") warmLive();
 }
 /* ---------- hamburger menu ---------- */
 function closeMenu(){ $("menu").hidden = true; $("menuBtn").setAttribute("aria-expanded", "false"); }
@@ -1698,14 +1762,23 @@ function updateAuthUI(){
     else el.textContent = tx("সাইন ইন করা নেই", "Nicht angemeldet");
   });
   if (!u && !configured) setSyncStatus(tx("Firebase এখনও সেট আপ হয়নি — SETUP-FIREBASE.md দেখুন", "Firebase ist noch nicht eingerichtet — siehe SETUP-FIREBASE.md"));
-  else if (!u) setSyncStatus(tx("সাইন ইন করলে অগ্রগতি ক্লাউডে সিঙ্ক হবে। এখন শুধু এই ফোনেই থাকছে।", "Nach der Anmeldung wird dein Fortschritt in der Cloud synchronisiert. Jetzt bleibt er nur auf diesem Handy."));
+  else if (!u) setSyncStatus(tx("আগে সাইন ইন করুন — তারপর অগ্রগতি ক্লাউডে সিঙ্ক হবে।", "Bitte zuerst anmelden — danach wird dein Fortschritt in der Cloud synchronisiert."));
+  updateGate();
+}
+function updateGate(){
+  const g = $("gate"); if (!g) return;
+  const u = (window.FirebaseSync && window.FirebaseSync.user) || null;
+  if (u) { g.hidden = true; return; }
+  /* Signed out: no part of the app is usable — stop any running session. */
+  if (active) { try { stopSession(); } catch(e){} setStatus(""); }
+  g.hidden = false;
 }
 function bindAuthButtons(root){
   (root || document).querySelectorAll(".googleSignInBtn").forEach(b => {
     if (b.dataset.bound) return; b.dataset.bound = "1";
     b.addEventListener("click", async () => {
       try { await window.FirebaseSync.signIn(); }
-      catch(e){ setSyncStatus(tx("সাইন ইন হয়নি", "Anmeldung fehlgeschlagen") + " (" + esc(e && e.message ? e.message : String(e)) + ")"); }
+      catch(e){ setSyncStatus(friendlyAuthErr(e)); }
     });
   });
   (root || document).querySelectorAll(".googleSignOutBtn").forEach(b => {
@@ -1747,8 +1820,8 @@ window.addEventListener("firebase-ready", () => { updateAuthUI(); if (window.Fir
 window.addEventListener("firebase-auth", (e) => {
   updateAuthUI();
   const u = e.detail && e.detail.user;
-  if (u) { setSyncStatus(tx("সাইন ইন হয়েছে — সিঙ্ক হচ্ছে…", "Angemeldet — synchronisiere…")); fbPullMerge(); }
-  else setSyncStatus(tx("সাইন আউট হয়েছে। অগ্রগতি শুধু এই ফোনেই থাকছে।", "Abgemeldet. Der Fortschritt bleibt nur auf diesem Handy."));
+  if (u) { setSyncStatus(tx("সাইন ইন হয়েছে — সিঙ্ক হচ্ছে…", "Angemeldet — synchronisiere…")); fbPullMerge(); if (!$("viewPractice").hidden) warmLive(); }
+  else setSyncStatus(tx("সাইন আউট হয়েছে — আবার সাইন ইন করুন।", "Abgemeldet — bitte erneut anmelden."));
 });
 
 /* ---------- Settings sheet (explicit Save — draft, nothing applies until Save) ---------- */
@@ -1809,7 +1882,7 @@ async function askProgress(q){
     const ans = (await callGemini(sys, "Progress summary: " + progressSummaryText() + "\n\nQuestion: " + q, null, 0.4)).trim();
     progChat.push({role:"ai", text:ans || tx("উত্তর পাওয়া যায়নি।", "Keine Antwort.")});
   } catch(err) {
-    progChat.push({role:"ai", text: tx("উত্তর পাওয়া যায়নি", "Keine Antwort") + " (" + err.message + ")"});
+    progChat.push({role:"ai", text: friendlyErr(err)});
   }
   if (progChat.length > 40) progChat = progChat.slice(-40);
   renderProgress();
