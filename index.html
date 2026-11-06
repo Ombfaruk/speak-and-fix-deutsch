@@ -345,9 +345,6 @@ details.adv .grid{margin-top:12px}
           <label class="f" for="apiKey2"><span data-bn="কোচের জন্য আলাদা API key (ঐচ্ছিক, ফাঁকা থাকলে উপরের key)" data-de="Separater Coach-API-Key (optional, leer = gleicher Key)">Separate coach API key</span>
             <input id="apiKey2" type="password" autocomplete="off" spellcheck="false" placeholder="AIza...">
           </label>
-          <label class="f" for="backupSecret"><span data-bn="ব্যাকআপ সিক্রেট (ঐচ্ছিক, দিলে সেশন শেষে অটো ব্যাকআপ যাবে)" data-de="Backup-Secret (optional, bei Angabe automatisches Backup nach der Sitzung)">Backup secret</span>
-            <input id="backupSecret" type="password" autocomplete="off" spellcheck="false" placeholder="••••••••">
-          </label>
           <label class="f" for="focus"><span data-bn="আমার দুর্বল জায়গা নিয়ে অনুশীলন" data-de="Meine Schwachstellen üben">Practise my weak areas</span>
             <select id="focus">
               <option value="1" data-bn="চালু" data-de="Ein">On</option>
@@ -420,7 +417,7 @@ const CAT_IDS = Object.keys(CAT);
 /* ---------- settings ---------- */
 const $ = id => document.getElementById(id);
 const DEFAULTS = {
-  apiKey:"", apiKey2:"", backupSecret:"", modelKind:"audio", voice:"Puck", level:"A1", topic:"sich vorstellen", fallback:"1", focus:"1", goal:"15",
+  apiKey:"", apiKey2:"", modelKind:"audio", voice:"Puck", level:"A1", topic:"sich vorstellen", fallback:"1", focus:"1", goal:"15",
   mStd:"gemini-3.8-live", mNat:"gemini-3.1-flash-live-preview", mGram:"gemini-3.8-flash",
   ui:"bn", theme:""
 };
@@ -432,7 +429,7 @@ if (cfg.mGram === "gemini-2.5-flash") cfg.mGram = DEFAULTS.mGram;
 function saveCfg(){ try { localStorage.setItem("sprichfix", JSON.stringify(cfg)); } catch(e){} }
 
 /* ---- Settings draft: edits are staged, nothing applies until Save ---- */
-const SETTING_KEYS = ["apiKey","apiKey2","backupSecret","modelKind","voice","level","topic","fallback","focus","goal"];
+const SETTING_KEYS = ["apiKey","apiKey2","modelKind","voice","level","topic","fallback","focus","goal"];
 let draft = Object.assign({}, cfg);
 let settingsDirty = false;
 function fillSettingsFromCfg(){
@@ -1369,16 +1366,6 @@ async function startSession(){
   closeSettingsSheet();
   if (kind === "browser") startBrowser(); else if (kind === "audio") audioOpen(); else openSocket();
 }
-/* ---------- auto-backup to Cloudflare after each session ---------- */
-const BACKUP_URL = "https://speakfix-deutsch-backup.aminuljoni180.workers.dev/backup";
-function uploadBackup(){
-  try {
-    if (!cfg.backupSecret) return;
-    const payload = JSON.stringify({secret: cfg.backupSecret, sessions: hist.sessions, review: rv});
-    if (payload.length > 900000) return;
-    fetch(BACKUP_URL, {method:"POST", headers:{"Content-Type":"application/json"}, body:payload}).catch(()=>{});
-  } catch(e){}
-}
 function stopSession(){
   active = false; setupDone = false;
   try { ws && ws.close(); } catch(e){}
@@ -1394,7 +1381,7 @@ function stopSession(){
   if (!sess.items.length) { hist.sessions = hist.sessions.filter(s => s !== sess); saveHist(); return; }
   saveHist();
   if (sess.items.length >= 3) makeReport(sess);
-  uploadBackup(); fbPushSoon();
+  fbPushSoon();
 }
 $("micBtn").addEventListener("click", () => {
   if (!active) startSession();
