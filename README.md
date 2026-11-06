@@ -23,14 +23,11 @@ Settings has an optional second key for the coach. Leave it empty to use one key
 Your API key and history are stored only in your browser (`localStorage`). Requests go directly from your browser to Google. Do not share a build with your key inside it.
 
 ## Deploy on GitHub Pages
-The repository name must be **`speak-and-fix`**, because `sw.js` and `manifest.webmanifest` use the path `/speak-and-fix/`.
-1. Create a public repository named `speak-and-fix`.
-2. Upload all files from this folder (keep the `.nojekyll` file and the `docs` folder).
+The repository name is **`speak-and-fix-deutsch`**, because `sw.js` and `manifest.webmanifest` use the path `/speak-and-fix-deutsch/`.
+1. Create a public repository named `speak-and-fix-deutsch`.
+2. Upload all files from this folder (keep the `.nojekyll` file).
 3. Settings → Pages → Source: *Deploy from a branch* → `main` / `(root)` → Save.
-4. Your site: `https://<your-username>.github.io/speak-and-fix/`
+4. Your site: `https://<your-username>.github.io/speak-and-fix-deutsch/`
 
 ## Updating
-After changing `index.html`, increase the cache name in `sw.js` (`speak-and-fix-v2` → `v3`), otherwise phones keep showing the old version.
-
-## Making an Android app
-See [docs/app-setup-bn.md](docs/app-setup-bn.md) (Bengali).
+After changing `index.html`, increase the cache name in `sw.js` (`sprich-fix-v1` → `sprich-fix-v2`), otherwise phones keep showing the old version.
