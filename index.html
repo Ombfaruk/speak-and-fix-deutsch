@@ -5,150 +5,222 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sprich &amp; Fix</title>
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#0b7a75">
+<meta name="theme-color" content="#58C800">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Sprich &amp; Fix">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Hind+Siliguri:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
 <style>
+/* Duolingo tokens, measured from real Mobbin Duolingo screens (see SCREENS.md / PATTERNS.md). */
 :root{
-  --bg:#eef2f4; --panel:#ffffff; --fg:#14202b; --muted:#5b6b78; --line:#d9e1e6;
-  --accent:#0b7a75; --accent-fg:#ffffff; --coach:#9a4b00; --coach-bg:#fff4e6;
-  --bad:#c0362c; --bad-bg:#fde8e5; --good:#18794e; --good-bg:#e4f5ec;
-  --me:#e3f1ef; --ai:#f1f4f6;
-  --f-display:"Bricolage Grotesque","Hind Siliguri",system-ui,sans-serif;
-  --f-body:"Hind Siliguri",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --bg:#FFFFFF; --panel:#FFFFFF; --fg:#404040; --muted:#777777; --line:#E5E5E5;
+  --accent:#58C800; --accent-fg:#FFFFFF; --accent-dark:#46A000;
+  --coach:#9A4B00; --coach-bg:#FFF4E6;
+  --bad:#FE4A4E; --bad-bg:#FFDFDF; --bad-dark:#CE3C3D;
+  --good:#46A000; --good-bg:#D8F8B8;
+  --blue:#1DB3FB; --blue-dark:#1493D8; --orange:#F08F1A; --gold:#FFC800;
+  --me:#EAF6FF; --ai:#F2FBEA; --partial:#FFF3D6;
+  --disabled:#E6E6E6; --disabled-text:#AFAFAF;
+  --f:"Hind Siliguri",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0e1418; --panel:#162027; --fg:#e6edf2; --muted:#93a4b1; --line:#26343d;
-    --accent:#3cc4bb; --accent-fg:#06231f; --coach:#ffb25e; --coach-bg:#2b2012;
-    --bad:#ff8a7a; --bad-bg:#3a1c19; --good:#5fd79b; --good-bg:#12301f;
-    --me:#17383a; --ai:#1d2a32; color-scheme:dark;
+    --bg:#131F24; --panel:#202F36; --fg:#F1F7FB; --muted:#A5B4C0; --line:#37464F;
+    --accent:#58C800; --accent-fg:#FFFFFF; --accent-dark:#46A000;
+    --coach:#FFB25E; --coach-bg:#2B2012;
+    --bad:#FF8A7A; --bad-bg:#3A1C19; --bad-dark:#CE3C3D;
+    --good:#7BE495; --good-bg:#12301F;
+    --me:#16324A; --ai:#1E3320; --partial:#3A2F14;
+    --disabled:#2A3A44; --disabled-text:#7A8B96; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0e1418; --panel:#162027; --fg:#e6edf2; --muted:#93a4b1; --line:#26343d;
-  --accent:#3cc4bb; --accent-fg:#06231f; --coach:#ffb25e; --coach-bg:#2b2012;
-  --bad:#ff8a7a; --bad-bg:#3a1c19; --good:#5fd79b; --good-bg:#12301f;
-  --me:#17383a; --ai:#1d2a32; color-scheme:dark;
+  --bg:#131F24; --panel:#202F36; --fg:#F1F7FB; --muted:#A5B4C0; --line:#37464F;
+  --accent:#58C800; --accent-fg:#FFFFFF; --accent-dark:#46A000;
+  --coach:#FFB25E; --coach-bg:#2B2012;
+  --bad:#FF8A7A; --bad-bg:#3A1C19; --bad-dark:#CE3C3D;
+  --good:#7BE495; --good-bg:#12301F;
+  --me:#16324A; --ai:#1E3320; --partial:#3A2F14;
+  --disabled:#2A3A44; --disabled-text:#7A8B96; color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
-body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--f-body);
-  padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px));
-  padding-block:12px}
-.app{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:12px;min-height:100%}
-header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-h1{font:700 22px/1.1 var(--f-display);margin:0;letter-spacing:-.01em}
-.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+body{background:var(--bg);color:var(--fg);font:16px/1.5 var(--f);-webkit-text-size-adjust:100%}
 button,select,input{font:inherit;color:inherit}
-.btn{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
-.expandBtn{background:transparent;border:1px solid var(--line);border-radius:999px;padding:4px 14px;margin:0 0 8px;cursor:pointer;font-size:13px;color:var(--muted)}
-.expandBtn:hover{color:var(--fg)}
-.btn:hover{border-color:var(--accent)}
-.btn.tab[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
-header{position:relative}
-#menuBtn{font-size:18px;line-height:1;padding:6px 14px}
-.menu{position:absolute;top:calc(100% + 6px);right:0;min-width:220px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 8px 28px rgba(0,0,0,.25);z-index:50;display:flex;flex-direction:column;gap:2px}
-.menu-item{background:transparent;border:0;border-radius:8px;padding:10px 12px;text-align:left;cursor:pointer;font-size:15px;color:var(--fg)}
+button{font-family:inherit;touch-action:manipulation;cursor:pointer}
+input,select,textarea{font-size:16px}
+[hidden]{display:none!important}
+.app{max-width:480px;margin:0 auto;display:flex;flex-direction:column;height:100vh;height:100dvh;background:var(--bg)}
+/* ---------- top bar + menu ---------- */
+.topbar{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:calc(12px + env(safe-area-inset-top,0px)) 20px 10px}
+.topbar h1{font-size:20px;font-weight:800;margin:0;letter-spacing:-.01em}
+.menu{position:absolute;top:calc(100% + 6px);right:20px;min-width:230px;background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:6px;box-shadow:0 8px 28px rgba(0,0,0,.25);z-index:60;display:flex;flex-direction:column;gap:2px}
+.menu-item{background:transparent;border:0;border-radius:10px;padding:12px;font-size:16px;font-weight:600;text-align:left;color:var(--fg);min-height:48px}
 .menu-item:hover{background:var(--line)}
-.menu-item.active{color:var(--accent);font-weight:700}
-.menu-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;font-size:15px;border-top:1px solid var(--line)}
-.menu-row .btn{padding:4px 12px;font-size:14px}
+.menu-item.active{color:var(--accent);font-weight:800}
+.menu-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;font-size:16px;border-top:2px solid var(--line)}
+/* ---------- buttons (chunky Duolingo 3D rule: 50px, 16 radius, 5px darker bottom edge) ---------- */
+.btn{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:10px 16px;font-weight:700;font-size:16px;min-height:50px;color:var(--fg)}
+.btn.primary{background:var(--accent);border:0;border-bottom:5px solid var(--accent-dark);color:#fff}
+.btn.blue{background:var(--blue);border:0;border-bottom:5px solid var(--blue-dark);color:#fff}
+.btn.red{background:var(--bad);border:0;border-bottom:5px solid var(--bad-dark);color:#fff}
+.btn.big{width:100%;font-size:17px}
 .btn.danger{color:var(--bad)}
-.btn:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible,.mic:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-details.settings{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
-details.settings summary{cursor:pointer;font-weight:600}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px 14px;margin-top:12px}
-label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);min-width:0}
-label.f input,label.f select{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;color:var(--fg);min-width:0;width:100%}
-.hint{font-size:12.5px;color:var(--muted);margin:8px 0 0}
-.panels{display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;min-height:0}
-@media (max-width:760px){.panels{grid-template-columns:1fr}}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;min-width:0;min-height:340px;max-height:calc(100vh - 150px)}
-@media (max-width:760px){.panel{max-height:none;min-height:300px}}
-.ph{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px}
-.ph h2{font:600 16px/1.2 var(--f-display);margin:0}
-.ph small{color:var(--muted)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.tab[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.icon{background:var(--panel);border:2px solid var(--line);border-radius:50%;width:44px;height:44px;min-height:44px;padding:0;font-size:19px;line-height:1}
+.btn:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible,.mic:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+/* ---------- views ---------- */
+.view{flex:1;min-height:0;overflow-y:auto;padding:4px 20px 16px;display:flex;flex-direction:column;gap:12px}
+#viewProgress,#viewMemory{display:none}
+.view[hidden]{display:none}
+/* lesson chrome: X · progress · flame */
+.lesson{display:flex;align-items:center;gap:14px;padding-top:6px}
+.lesson .x{background:transparent;border:0;color:var(--muted);font-size:20px;font-weight:800;width:40px;height:40px;min-height:40px;border-radius:50%;flex-shrink:0}
+.lesson .x.dim{opacity:.4}
+.pbar{flex:1;height:16px;background:var(--line);border-radius:999px;overflow:hidden}
+.pfill{height:100%;background:var(--accent);border-radius:999px}
+.flame{font-size:17px;font-weight:800;color:var(--orange);white-space:nowrap;flex-shrink:0}
+/* goal bar */
+.goal{display:grid;grid-template-columns:auto minmax(60px,1fr) auto;gap:10px;align-items:center;font-size:14px;background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:10px 12px}
+.btrack{height:16px;background:var(--line);border-radius:999px;overflow:hidden}
+.bfill{height:100%;background:var(--bad);border-radius:999px}
+.bfill.ok{background:var(--accent)}
+.num{font-variant-numeric:tabular-nums;text-align:right}
+/* install banner */
+.install-banner{background:var(--coach-bg);color:var(--coach);border-radius:16px;padding:12px 14px;font-size:14px;display:flex;gap:10px;align-items:flex-start}
+.install-banner button{margin-left:auto;background:none;border:0;font-size:18px;color:var(--coach);padding:4px 8px;min-height:44px}
+/* panels + feeds */
+.panel{background:var(--panel);border:2px solid var(--line);border-radius:16px;display:flex;flex-direction:column;min-width:0}
+.ph{padding:12px 14px;border-bottom:2px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ph h2{font-size:17px;font-weight:800;margin:0}
+.ph small{color:var(--muted);font-size:13px}
 .feed{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-height:0}
-.empty{color:var(--muted);margin:auto;text-align:center;max-width:30ch}
-.msg{max-width:88%;padding:8px 12px;border-radius:12px;overflow-wrap:anywhere}
+#convFeed{min-height:230px;max-height:44vh}
+#coachFeed{min-height:170px;max-height:40vh}
+.empty{color:var(--muted);margin:auto;text-align:center;max-width:30ch;font-size:15px}
+.msg{max-width:88%;padding:10px 12px;border-radius:14px;overflow-wrap:anywhere;font-size:16px;line-height:1.45}
 .msg.me{align-self:flex-end;background:var(--me);border-bottom-right-radius:4px}
 .msg.ai{align-self:flex-start;background:var(--ai);border-bottom-left-radius:4px}
-.msg .who{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.msg .who{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;font-weight:700}
 .msg.live{opacity:.75}
-.ctl{padding:12px 14px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;
-  padding-bottom:max(12px,env(safe-area-inset-bottom,0px))}
-.mic{border:0;border-radius:999px;background:var(--accent);color:var(--accent-fg);font-weight:600;padding:11px 20px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;position:relative;--mic-level:0;transition:box-shadow .2s ease,transform .12s ease-out,background-color .25s ease}
-.mic[aria-pressed="true"]{background:var(--bad);color:#fff}
-.mic.live{box-shadow:0 0 calc(10px + var(--mic-level)*30px) calc(2px + var(--mic-level)*7px) var(--accent);transform:scale(calc(1 + var(--mic-level)*0.05))}
-.mic.live::before{content:"";position:absolute;inset:-5px;border-radius:999px;border:calc(1px + var(--mic-level)*2px) solid var(--accent);opacity:calc(0.3 + var(--mic-level)*0.7);pointer-events:none;transition:opacity .12s ease-out}
-.dot{width:9px;height:9px;border-radius:50%;background:currentColor;opacity:.9;transition:transform .12s ease-out}
-.mic.live .dot{transform:scale(calc(1 + var(--mic-level)*0.9))}
-@media (prefers-reduced-motion:reduce){.mic.live{transform:none}}
-.status{font-size:13px;color:var(--muted);flex:1;min-width:140px}
+.expandBtn{background:transparent;border:0;border-bottom:2px solid var(--line);padding:8px 14px;cursor:pointer;font-size:14px;color:var(--muted);min-height:44px}
+/* mic controls (sticky above the tab bar) */
+.ctl{position:sticky;bottom:0;background:var(--bg);padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px}
+.mic{border:0;border-radius:16px;background:var(--accent);border-bottom:5px solid var(--accent-dark);color:#fff;font-weight:800;font-size:17px;padding:0 20px;height:56px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;position:relative;--mic-level:0;transition:box-shadow .2s ease,transform .12s ease-out,background-color .25s ease;touch-action:manipulation}
+.mic[aria-pressed="true"]{background:var(--bad);border-bottom-color:var(--bad-dark)}
+.mic.live{box-shadow:0 0 calc(10px + var(--mic-level)*30px) calc(2px + var(--mic-level)*7px) var(--accent);transform:scale(calc(1 + var(--mic-level)*0.04))}
+.dot{width:10px;height:10px;border-radius:50%;background:currentColor;opacity:.9}
+.statusrow{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.status{font-size:13px;color:var(--muted);flex:1;min-width:120px}
 .status.err{color:var(--bad)}
-.card{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;background:var(--panel)}
-.card .orig{overflow-wrap:anywhere}
-mark{background:var(--bad-bg);color:var(--bad);border-radius:3px;padding:0 2px;font-weight:600}
-.fix{background:var(--good-bg);color:var(--good);border-radius:8px;padding:6px 10px;font-weight:500;overflow-wrap:anywhere}
-.why{color:var(--fg)}
-.nat{color:var(--coach);background:var(--coach-bg);border-radius:8px;padding:6px 10px;font-size:14px;overflow-wrap:anywhere}
-.perfect{color:var(--good);font-weight:600}
+.latency{font-size:13px;font-weight:800;color:var(--muted);white-space:nowrap}
+.notice{background:var(--coach-bg);color:var(--coach);border-radius:12px;padding:10px 12px;font-size:14px}
+/* coach cards */
+.card{border:2px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--panel)}
+.card .orig{overflow-wrap:anywhere;font-size:16px}
+mark{background:var(--bad-bg);color:var(--bad);border-radius:3px;padding:0 2px;font-weight:700}
+.fix{background:var(--good-bg);color:var(--good);border-radius:10px;padding:8px 10px;font-weight:700;overflow-wrap:anywhere}
+.why{color:var(--fg);font-size:15px}
+.nat{color:var(--coach);background:var(--coach-bg);border-radius:10px;padding:8px 10px;font-size:15px;overflow-wrap:anywhere}
+.perfect{color:var(--good);font-weight:800}
 .pending{color:var(--muted);font-style:italic}
-.tag{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tag{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:1px 9px;color:var(--muted)}
+.chip{font-size:13px;border:1.5px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
 .chip.bad{color:var(--bad);border-color:var(--bad)}
-.notice{background:var(--coach-bg);color:var(--coach);border-radius:8px;padding:8px 12px;font-size:13.5px}
-.report{border:1px solid var(--accent);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--panel)}
-.report h4,.prog h3{font:600 15px/1.3 var(--f-display);margin:0}
+.report{border:2px solid var(--accent);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--panel)}
+.report h4,.prog h3{font-size:16px;font-weight:800;margin:0}
 .bands{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:8px}
-.band{border:1px solid var(--line);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;gap:2px}
-.band b{font:700 22px/1 var(--f-display)}
+.band{border:2px solid var(--line);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:2px}
+.band b{font-size:22px;font-weight:800}
 .band span{font-size:12px;color:var(--muted)}
 .band.main{border-color:var(--accent)}
 .report ul,.prog ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px}
-.prog{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:18px}
-.prog section{display:flex;flex-direction:column;gap:8px;min-width:0}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
-.bars{display:flex;flex-direction:column;gap:6px}
-.brow{display:grid;grid-template-columns:minmax(110px,170px) 1fr 34px;gap:8px;align-items:center;font-size:14px}
-.btrack{height:10px;background:var(--bg);border-radius:6px;overflow:hidden}
-.bfill{height:100%;background:var(--bad);border-radius:6px}
-.bfill.ok{background:var(--accent)}
-.num{font-variant-numeric:tabular-nums;text-align:right}
+/* progress / goal */
+.prog{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:20px}
+.prog section{display:flex;flex-direction:column;gap:10px;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px}
+.bars{display:flex;flex-direction:column;gap:8px}
+.brow{display:grid;grid-template-columns:minmax(100px,150px) 1fr 34px;gap:8px;align-items:center;font-size:14px}
 .rec{display:flex;gap:8px;flex-wrap:wrap;align-items:baseline;overflow-wrap:anywhere}
-.rec s{color:var(--bad)} .rec em{color:var(--good);font-style:normal;font-weight:500}
-.sess{border:1px solid var(--line);border-radius:10px;padding:8px 12px}
-.sess summary{cursor:pointer;display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between}
-.sess .body{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-.plan{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--bg);border-radius:8px;padding:10px 12px}
+.rec s{color:var(--bad)} .rec em{color:var(--good);font-style:normal;font-weight:700}
+.sess{border:2px solid var(--line);border-radius:12px;padding:10px 12px}
+.sess summary{cursor:pointer;display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;min-height:44px;align-items:center}
+.sess .body{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.plan{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px 12px}
 .row{display:flex;gap:8px;flex-wrap:wrap}
-.goal{display:grid;grid-template-columns:auto minmax(60px,1fr) auto;gap:10px;align-items:center;font-size:13.5px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
-.subbody{display:flex;flex-direction:column;gap:18px;min-width:0}
-.dayhead{display:flex;gap:6px 12px;flex-wrap:wrap;align-items:center}
-.li2{display:flex;flex-direction:column;gap:2px;padding:6px 0;border-top:1px solid var(--line)}
+.subbody{display:flex;flex-direction:column;gap:20px;min-width:0}
+.li2{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-top:2px solid var(--line)}
 .li2:first-child{border-top:0}
 .ctx{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
 ul.plain{list-style:none;padding:0;margin:0}
-.flash{border:1px solid var(--accent);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;max-width:640px}
+.flash{border:2px solid var(--accent);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
 .flash .big{font-size:18px;overflow-wrap:anywhere}
 .small{font-size:13px}
-[hidden]{display:none!important}
+.hint{font-size:13px;color:var(--muted);margin:8px 0 0}
+/* streak header + calendar (Goal tab) */
+.streak-head{display:flex;align-items:center;gap:14px}
+.streak-head .fl{font-size:52px;line-height:1}
+.streak-head .num{font-size:36px;font-weight:800;color:var(--orange);line-height:1}
+.streak-head .lbl{font-size:17px;font-weight:800}
+.streak-head .best{font-size:13px;font-weight:700;color:var(--muted);margin-top:4px}
+.streak-head .xp{margin-left:auto;text-align:right}
+.streak-head .xp .n{font-size:28px;font-weight:800;color:var(--gold);line-height:1}
+.streak-head .xp .l{font-size:13px;font-weight:700;color:var(--muted)}
+.cal{display:flex;flex-wrap:wrap;gap:8px}
+.day{width:38px;height:38px;border-radius:50%;text-align:center;line-height:38px;font-size:14px;font-weight:800;border:2px solid var(--line);color:var(--fg)}
+.day.done{background:var(--orange);border-color:var(--orange);color:#fff}
+.day.part{background:var(--partial);border-color:var(--partial)}
+/* ask-about-progress chat */
+.chat-feed{display:flex;flex-direction:column;gap:8px}
+.composer{display:flex;gap:8px;align-items:center}
+.composer input{flex:1;border:2px solid var(--line);border-radius:999px;padding:12px 16px;font-size:16px;background:var(--panel);color:var(--fg);min-width:0}
+/* settings sheet */
+.sheet{position:fixed;inset:0;z-index:80;background:var(--bg);display:flex;flex-direction:column;width:100%;max-width:480px;left:50%;transform:translateX(-50%)}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:calc(14px + env(safe-area-inset-top,0px)) 20px 12px;border-bottom:2px solid var(--line);background:var(--bg)}
+.sheet-head h2{font-size:20px;font-weight:800;margin:0}
+.sheet-body{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px}
+.sheet-foot{position:sticky;bottom:0;background:var(--bg);border-top:2px solid var(--line);padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px))}
+.auth-card{border:2px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.auth-card .who-line{font-size:15px;font-weight:700;overflow-wrap:anywhere}
+.sync-line{font-size:13px;color:var(--muted)}
+label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--muted);min-width:0}
+label.f input,label.f select{background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:12px;color:var(--fg);min-width:0;width:100%;font-size:16px}
+details.adv{border:2px solid var(--line);border-radius:16px;padding:12px 14px}
+details.adv summary{cursor:pointer;font-weight:800;min-height:44px;display:flex;align-items:center}
+details.adv .grid{margin-top:12px}
+.grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:420px){.grid.two{grid-template-columns:1fr 1fr}}
+/* memory */
+.mem-card{border:2px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--panel)}
+.mem-card h3{font-size:17px;font-weight:800;margin:0}
+.mem-row{display:flex;justify-content:space-between;gap:8px;font-size:15px}
+.mem-row .a{font-weight:600}
+.mem-row .b{font-weight:800}
+.mem-note{font-size:13px;color:var(--muted)}
+/* bottom tab bar */
+.tabbar{display:flex;border-top:2px solid var(--line);background:var(--panel);padding:6px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+.tabbtn{flex:1;background:none;border:0;padding:8px 0;font-size:13px;font-weight:800;color:var(--muted);border-radius:12px;min-height:52px}
+.tabbtn.on{color:var(--accent)}
+.tabbtn .ic{display:block;font-size:22px;line-height:1.2}
+@media (prefers-reduced-motion:reduce){.mic.live{transform:none}}
 </style>
 </head>
+
 <body>
 <div class="app">
-  <header>
+  <header class="topbar">
     <h1 id="t-title">Sprich &amp; Fix</h1>
-    <div class="bar">
-      <button class="btn" id="menuBtn" type="button" aria-label="Menu" aria-expanded="false">☰</button>
-    </div>
+    <button class="btn icon" id="menuBtn" type="button" aria-label="Menu" aria-expanded="false">☰</button>
     <nav class="menu" id="menu" hidden>
       <button class="menu-item active" id="mPractice" type="button" data-bn="অনুশীলন" data-de="Üben">Practice</button>
       <button class="menu-item" id="mProgress" type="button" data-bn="অগ্রগতি" data-de="Fortschritt">Progress</button>
+      <button class="menu-item" id="mMemory" type="button" data-bn="মেমরি" data-de="Gedächtnis">Memory</button>
       <button class="menu-item" id="mSettings" type="button" data-bn="সেটিংস" data-de="Einstellungen">Settings</button>
       <div class="menu-row">
         <span data-bn="ভাষা" data-de="Sprache">Language</span>
@@ -161,19 +233,79 @@ ul.plain{list-style:none;padding:0;margin:0}
     </nav>
   </header>
 
-  <div id="viewPractice" style="display:flex;flex-direction:column;gap:12px;flex:1;min-height:0">
+  <div class="view" id="viewPractice" style="display:flex">
+    <div class="install-banner" id="installBanner" hidden>
+      <span data-bn="হোম স্ক্রিনে যোগ করুন: Safari-তে Share (⎋) → Add to Home Screen চাপুন। তাহলে অ্যাপের মতো খুলবে।" data-de="Zum Home-Bildschirm hinzufügen: In Safari auf Teilen tippen → „Zum Home-Bildschirm“. Dann öffnet sie sich wie eine App.">Add to Home Screen: in Safari tap Share → Add to Home Screen. Then it opens like an app.</span>
+      <button id="installDismiss" type="button" aria-label="Dismiss">✕</button>
+    </div>
+
+    <div class="lesson">
+      <button class="x dim" id="lessonClose" type="button" aria-label="End session">✕</button>
+      <div class="pbar"><div class="pfill" id="lessonFill" style="width:0%"></div></div>
+      <span class="flame" id="lessonFlame">🔥 0</span>
+    </div>
+
     <div class="goal" id="goalBar"></div>
-    <details class="settings" id="settings">
-      <summary id="t-settings">Settings</summary>
-      <div class="grid">
+    <div class="notice" id="notice" hidden></div>
+
+    <section class="panel" aria-labelledby="h-conv">
+      <div class="ph"><h2 id="h-conv">Conversation</h2><small id="timer">00:00</small></div>
+      <button class="expandBtn" id="convExpand" type="button" hidden></button>
+      <div class="feed" id="convFeed" aria-live="polite"><p class="empty" id="convEmpty">Press the mic and start talking.</p></div>
+    </section>
+
+    <section class="panel" aria-labelledby="h-coach">
+      <div class="ph"><h2 id="h-coach">Grammar coach</h2><small id="t-listening">Listening quietly</small></div>
+      <button class="expandBtn" id="coachExpand" type="button" hidden></button>
+      <div class="feed" id="coachFeed" aria-live="polite"><p class="empty" id="coachEmpty">Each sentence you say is checked here.</p></div>
+    </section>
+
+    <div class="ctl">
+      <div class="statusrow"><span class="status" id="status"></span><span class="latency" id="latency" hidden></span></div>
+      <button class="mic" id="micBtn" type="button" aria-pressed="false"><span class="dot"></span><span id="micLabel">Start talking</span></button>
+      <div class="row" style="justify-content:center">
+        <button class="btn" id="endBtn" type="button" hidden data-bn="সেশন শেষ" data-de="Sitzung beenden">End session</button>
+        <button class="btn danger" id="stopRecBtn" type="button" hidden data-bn="⏹ থামুন" data-de="⏹ Stopp">⏹ Stop</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="view" id="viewProgress" hidden>
+    <div class="prog" id="progBody"></div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="exportBtn" type="button" data-bn="হিস্ট্রি ডাউনলোড (backup)" data-de="Verlauf herunterladen (Backup)">Download history</button>
+      <button class="btn" id="importBtn" type="button" data-bn="Backup থেকে ফিরিয়ে আনুন" data-de="Aus Backup wiederherstellen">Restore</button>
+      <input id="importFile" type="file" accept="application/json,.json" hidden>
+      <button class="btn danger" id="clearBtn" type="button" data-bn="সব হিস্ট্রি মুছুন" data-de="Gesamten Verlauf löschen">Delete all history</button>
+    </div>
+    <p class="hint" id="dataMsg"></p>
+    <p class="hint" data-bn="হিস্ট্রি এই ফোনেই সেভ থাকে। অন্য ফোন বা ব্রাউজারে নিতে হলে ডাউনলোড করে সেখানে ফিরিয়ে আনুন। ব্রাউজারের ডেটা মুছলে হিস্ট্রিও মুছে যাবে। Google দিয়ে সাইন ইন করলে অগ্রগতি ক্লাউডেও সিঙ্ক হয়।" data-de="Der Verlauf wird nur auf diesem Handy gespeichert. Um ihn auf ein anderes Handy oder einen anderen Browser zu übertragen, lade ihn herunter und stelle ihn dort wieder her. Wenn du die Browserdaten löschst, wird auch der Verlauf gelöscht. Wenn du dich mit Google anmeldest, wird dein Fortschritt auch in der Cloud synchronisiert.">History is saved on this phone only. To move it to another phone or browser, download it and restore it there. Clearing browser data deletes the history. Signing in with Google also syncs progress to the cloud.</p>
+  </div>
+
+  <div class="view" id="viewMemory" hidden>
+    <div id="memoryBody" style="display:flex;flex-direction:column;gap:14px"></div>
+  </div>
+
+  <nav class="tabbar">
+    <button class="tabbtn on" data-view="practice" type="button"><span class="ic">🎙</span><span data-bn="কথা বলা" data-de="Sprechen">Speaking</span></button>
+    <button class="tabbtn" data-view="progress" type="button"><span class="ic">🔥</span><span data-bn="লক্ষ্য" data-de="Ziel">Goal</span></button>
+  </nav>
+
+  <div class="sheet" id="settingsSheet" hidden>
+    <div class="sheet-head"><h2 id="t-settings">Settings</h2><button class="btn icon" id="settingsClose" type="button" aria-label="Close">✕</button></div>
+    <div class="sheet-body">
+      <div class="auth-card">
+        <div class="who-line authUserLine" data-bn="সাইন ইন করা নেই" data-de="Nicht angemeldet">Not signed in</div>
+        <div class="row">
+          <button class="btn primary googleSignInBtn" type="button" data-bn="Google দিয়ে সাইন ইন করুন" data-de="Mit Google anmelden">Sign in with Google</button>
+          <button class="btn googleSignOutBtn" type="button" hidden data-bn="সাইন আউট" data-de="Abmelden">Sign out</button>
+        </div>
+        <div class="sync-line syncStatus" data-bn="সাইন ইন করলে অগ্রগতি ক্লাউডে সিঙ্ক হবে। এখন শুধু এই ফোনেই থাকছে।" data-de="Nach der Anmeldung wird dein Fortschritt in der Cloud synchronisiert. Jetzt bleibt er nur auf diesem Handy.">Sign in to sync progress to the cloud. Right now it stays on this phone only.</div>
+      </div>
+
+      <div class="grid two">
         <label class="f" for="apiKey"><span id="t-key">Gemini API key</span>
           <input id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="AIza...">
-        </label>
-        <label class="f" for="apiKey2"><span data-bn="কোচের জন্য আলাদা API key (ঐচ্ছিক, ফাঁকা থাকলে উপরের key)" data-de="Separater Coach-API-Key (optional, leer = gleicher Key)">Separate coach API key</span>
-          <input id="apiKey2" type="password" autocomplete="off" spellcheck="false" placeholder="AIza...">
-        </label>
-        <label class="f" for="backupSecret"><span data-bn="ব্যাকআপ সিক্রেট (ঐচ্ছিক, দিলে সেশন শেষে অটো ব্যাকআপ যাবে)" data-de="Backup-Secret (optional, bei Angabe automatisches Backup nach der Sitzung)">Backup secret</span>
-          <input id="backupSecret" type="password" autocomplete="off" spellcheck="false" placeholder="••••••••">
         </label>
         <label class="f" for="modelKind"><span id="t-voicemodel">Voice model</span>
           <select id="modelKind">
@@ -209,25 +341,32 @@ ul.plain{list-style:none;padding:0;margin:0}
             <option value="freie Wahl">Freie Wahl (নিজের পছন্দ)</option>
           </select>
         </label>
-        <label class="f" for="focus"><span data-bn="আমার দুর্বল জায়গা নিয়ে অনুশীলন" data-de="Meine Schwachstellen üben">Practise my weak areas</span>
-          <select id="focus">
-            <option value="1" data-bn="চালু" data-de="Ein">On</option>
-            <option value="0" data-bn="বন্ধ" data-de="Aus">Off</option>
-          </select>
-        </label>
         <label class="f" for="goal"><span data-bn="প্রতিদিনের লক্ষ্য (বাক্য)" data-de="Tagesziel (Sätze)">Daily goal (sentences)</span>
           <select id="goal"><option value="10">10</option><option value="15" selected>15</option><option value="20">20</option><option value="30">30</option><option value="50">50</option></select>
         </label>
-        <label class="f" for="fallback"><span id="t-fallback">If native audio runs out</span>
-          <select id="fallback">
-            <option value="1" id="o-fb1">Switch to standard</option>
-            <option value="0" id="o-fb0">Stop and tell me</option>
-          </select>
-        </label>
       </div>
-      <details style="margin-top:12px" open>
+
+      <details class="adv" id="advDetails">
         <summary id="t-adv">Model names (change if Google renames them)</summary>
         <div class="grid">
+          <label class="f" for="apiKey2"><span data-bn="কোচের জন্য আলাদা API key (ঐচ্ছিক, ফাঁকা থাকলে উপরের key)" data-de="Separater Coach-API-Key (optional, leer = gleicher Key)">Separate coach API key</span>
+            <input id="apiKey2" type="password" autocomplete="off" spellcheck="false" placeholder="AIza...">
+          </label>
+          <label class="f" for="backupSecret"><span data-bn="ব্যাকআপ সিক্রেট (ঐচ্ছিক, দিলে সেশন শেষে অটো ব্যাকআপ যাবে)" data-de="Backup-Secret (optional, bei Angabe automatisches Backup nach der Sitzung)">Backup secret</span>
+            <input id="backupSecret" type="password" autocomplete="off" spellcheck="false" placeholder="••••••••">
+          </label>
+          <label class="f" for="focus"><span data-bn="আমার দুর্বল জায়গা নিয়ে অনুশীলন" data-de="Meine Schwachstellen üben">Practise my weak areas</span>
+            <select id="focus">
+              <option value="1" data-bn="চালু" data-de="Ein">On</option>
+              <option value="0" data-bn="বন্ধ" data-de="Aus">Off</option>
+            </select>
+          </label>
+          <label class="f" for="fallback"><span id="t-fallback">If native audio runs out</span>
+            <select id="fallback">
+              <option value="1" id="o-fb1">Switch to standard</option>
+              <option value="0" id="o-fb0">Stop and tell me</option>
+            </select>
+          </label>
           <label class="f" for="mStd"><span data-bn="স্ট্যান্ডার্ড Live মডেল" data-de="Standard-Live-Modell">Standard Live model</span>
             <select id="mStd"></select><input id="mStdC" spellcheck="false" placeholder="Modellname" hidden></label>
           <label class="f" for="mNat"><span data-bn="নেটিভ অডিও মডেল" data-de="Natives Audiomodell">Native audio model</span>
@@ -236,42 +375,16 @@ ul.plain{list-style:none;padding:0;margin:0}
             <select id="mGram"></select><input id="mGramC" spellcheck="false" placeholder="Modellname" hidden></label>
         </div>
       </details>
+
       <p class="hint" id="t-hint">Your key is stored only in this browser. Use headphones so the mic does not hear the voice.</p>
-    </details>
-
-    <div class="notice" id="notice" hidden></div>
-
-    <main class="panels">
-      <section class="panel" aria-labelledby="h-conv">
-        <div class="ph"><h2 id="h-conv">Conversation</h2><small id="timer">00:00</small></div>
-        <button class="expandBtn" id="convExpand" type="button" hidden></button>
-        <div class="feed" id="convFeed" aria-live="polite"><p class="empty" id="convEmpty">Press the mic and start talking.</p></div>
-        <div class="ctl">
-          <button class="mic" id="micBtn" type="button" aria-pressed="false"><span class="dot"></span><span id="micLabel">Start talking</span></button>
-          <button class="btn" id="endBtn" type="button" hidden data-bn="সেশন শেষ" data-de="Sitzung beenden">End session</button>
-          <button class="btn danger" id="stopRecBtn" type="button" hidden data-bn="⏹ থামুন" data-de="⏹ Stopp">⏹ Stop</button>
-          <span class="status" id="status"></span>
-        </div>
-      </section>
-
-      <section class="panel" aria-labelledby="h-coach">
-        <div class="ph"><h2 id="h-coach">Grammar coach</h2><small id="t-listening">Listening quietly</small></div>
-        <button class="expandBtn" id="coachExpand" type="button" hidden></button>
-        <div class="feed" id="coachFeed" aria-live="polite"><p class="empty" id="coachEmpty">Each sentence you say is checked here.</p></div>
-      </section>
-    </main>
-  </div>
-
-  <div id="viewProgress" hidden>
-    <div class="prog" id="progBody"></div>
-    <div class="row" style="margin-top:12px">
-      <button class="btn" id="exportBtn" type="button" data-bn="হিস্ট্রি ডাউনলোড (backup)" data-de="Verlauf herunterladen (Backup)">Download history</button>
-      <button class="btn" id="importBtn" type="button" data-bn="Backup থেকে ফিরিয়ে আনুন" data-de="Aus Backup wiederherstellen">Restore</button>
-      <input id="importFile" type="file" accept="application/json,.json" hidden>
-      <button class="btn danger" id="clearBtn" type="button" data-bn="সব হিস্ট্রি মুছুন" data-de="Gesamten Verlauf löschen">Delete all history</button>
+      <p class="hint" data-bn="ফ্রি key নিন: Google AI Studio (aistudio.google.com/apikey) থেকে। Key শুধু এই ফোনের ব্রাউজারে থাকে — কোডে বা ক্লাউডে যায় না।" data-de="Kostenloser Key: Google AI Studio (aistudio.google.com/apikey). Der Key bleibt nur in diesem Browser — er geht nicht in den Code oder in die Cloud.">Free key: Google AI Studio (aistudio.google.com/apikey). The key stays only in this browser — it never goes into the code or the cloud.</p>
+      <p class="hint" data-bn="অগ্রগতি এই ফোনেই থাকে। ব্যাকআপ নিতে Goal tab থেকে Export করুন।" data-de="Dein Fortschritt bleibt auf diesem Handy. Exportiere ein Backup über den Ziel-Tab.">Progress stays on this phone. Export a backup from the Goal tab.</p>
+      <div class="row">
+        <button class="btn" id="exportBtn2" type="button" data-bn="হিস্ট্রি ডাউনলোড (backup)" data-de="Verlauf herunterladen (Backup)">Download history</button>
+        <button class="btn" id="importBtn2" type="button" data-bn="Backup থেকে ফিরিয়ে আনুন" data-de="Aus Backup wiederherstellen">Restore</button>
+      </div>
     </div>
-    <p class="hint" id="dataMsg"></p>
-    <p class="hint" data-bn="হিস্ট্রি এই ব্রাউজারেই সেভ থাকে। অন্য ফোন বা ব্রাউজারে নিতে হলে ডাউনলোড করে সেখানে ফিরিয়ে আনুন। ব্রাউজারের ডেটা মুছলে হিস্ট্রিও মুছে যাবে।" data-de="Der Verlauf wird nur in diesem Browser gespeichert. Um ihn auf ein anderes Handy oder einen anderen Browser zu übertragen, lade ihn herunter und stelle ihn dort wieder her. Wenn du die Browserdaten löschst, wird auch der Verlauf gelöscht.">History is saved in this browser only.</p>
+    <div class="sheet-foot"><button class="btn primary big" id="saveSettingsBtn" type="button" disabled data-bn="সেভ করুন" data-de="Speichern">Save</button></div>
   </div>
 </div>
 
@@ -330,12 +443,36 @@ if (cfg.mNat === "gemini-2.5-flash-native-audio-preview-09-2025") cfg.mNat = DEF
 if (cfg.mGram === "gemini-2.5-flash") cfg.mGram = DEFAULTS.mGram;
 function saveCfg(){ try { localStorage.setItem("sprichfix", JSON.stringify(cfg)); } catch(e){} }
 
-["apiKey","apiKey2","backupSecret","modelKind","voice","level","topic","fallback","focus","goal"].forEach(k => {
-  const el = $(k); el.value = cfg[k];
-  if (el.value !== cfg[k] && el.tagName === "SELECT") el.selectedIndex = 0;
-  const h = () => { cfg[k] = el.value.trim(); saveCfg(); };
+/* ---- Settings draft: edits are staged, nothing applies until Save ---- */
+const SETTING_KEYS = ["apiKey","apiKey2","backupSecret","modelKind","voice","level","topic","fallback","focus","goal"];
+let draft = Object.assign({}, cfg);
+let settingsDirty = false;
+function fillSettingsFromCfg(){
+  draft = Object.assign({}, cfg);
+  SETTING_KEYS.forEach(k => { const el = $(k); if (!el) return; el.value = cfg[k]; if (el.value !== cfg[k] && el.tagName === "SELECT") el.selectedIndex = 0; });
+  syncModelSelects();
+  markSettingsDirty(false);
+}
+function markSettingsDirty(d){
+  settingsDirty = d;
+  const b = $("saveSettingsBtn");
+  if (b) { b.disabled = !d; if (!d) b.textContent = tx("সেভ করুন", "Speichern"); }
+}
+SETTING_KEYS.forEach(k => {
+  const el = $(k); if (!el) return;
+  const h = () => { draft[k] = el.value.trim(); markSettingsDirty(true); };
   el.addEventListener("change", h); el.addEventListener("input", h);
 });
+function saveSettings(){
+  if (!settingsDirty) return;
+  Object.assign(cfg, draft);
+  saveCfg();
+  applyLang();
+  markSettingsDirty(false);
+  const b = $("saveSettingsBtn");
+  if (b) b.textContent = tx("সেভ হয়েছে ✓", "Gespeichert ✓");
+  setTimeout(() => { closeSettingsSheet(); }, 900);
+}
 
 /* model dropdowns: every model listed on Google's models page (Oct 2026), plus a custom entry */
 const LIVE_MODELS = [
@@ -357,18 +494,23 @@ const TEXT_MODELS = [
   ["gemini-2.5-flash-lite","Gemini 2.5 Flash-Lite (past users only)"]
 ];
 const MODEL_LISTS = {mStd:LIVE_MODELS, mNat:LIVE_MODELS, mGram:TEXT_MODELS};
+function syncModelSelects(){
+  Object.keys(MODEL_LISTS).forEach(k => {
+    const sel = $(k), inp = $(k + "C"), list = MODEL_LISTS[k];
+    if (list.some(([v]) => v === draft[k])) { sel.value = draft[k]; inp.hidden = true; }
+    else { sel.value = "__custom"; inp.value = draft[k]; inp.hidden = false; }
+  });
+}
 Object.keys(MODEL_LISTS).forEach(k => {
   const sel = $(k), inp = $(k + "C"), list = MODEL_LISTS[k];
   list.forEach(([v, l]) => sel.add(new Option(l, v)));
   sel.add(new Option("Andere (Name eingeben)…", "__custom"));
-  if (list.some(([v]) => v === cfg[k])) sel.value = cfg[k];
-  else { sel.value = "__custom"; inp.value = cfg[k]; inp.hidden = false; }
   sel.addEventListener("change", () => {
-    if (sel.value === "__custom") { inp.hidden = false; inp.focus(); if (inp.value.trim()) cfg[k] = inp.value.trim(); }
-    else { inp.hidden = true; cfg[k] = sel.value; }
-    saveCfg();
+    if (sel.value === "__custom") { inp.hidden = false; inp.focus(); if (inp.value.trim()) draft[k] = inp.value.trim(); }
+    else { inp.hidden = true; draft[k] = sel.value; }
+    markSettingsDirty(true);
   });
-  inp.addEventListener("input", () => { if (inp.value.trim()) { cfg[k] = inp.value.trim(); saveCfg(); } });
+  inp.addEventListener("input", () => { if (inp.value.trim()) { draft[k] = inp.value.trim(); markSettingsDirty(true); } });
 });
 
 function t(k){ return I18N[cfg.ui][k]; }
@@ -385,6 +527,7 @@ function applyLang(){
   collapseFeed("convFeed","convExpand"); collapseFeed("coachFeed","coachExpand");
   setThemeLabel();
   renderGoal();
+  updateAuthUI();
 }
 $("langBtn").addEventListener("click", () => { cfg.ui = cfg.ui === "bn" ? "de" : "bn"; saveCfg(); applyLang(); });
 function isDark(){
@@ -519,6 +662,7 @@ function flushUser(){
 function endTurn(){
   flushUser();
   if (curAi) { curAi.classList.remove("live"); curAi = null; aiText = ""; }
+  userSpeechEndAt = 0;
 }
 
 /* ---------- Gemini text calls (grammar, report, plan) ---------- */
@@ -957,10 +1101,10 @@ function handleMsg(msg){
   if (msg.goAway) { try { ws.close(); } catch(e){} return; }
   const sc = msg.serverContent; if (!sc) return;
   if (sc.interrupted) { stopPlayback(); endTurn(); }
-  if (sc.inputTranscription && sc.inputTranscription.text) appendMe(sc.inputTranscription.text);
+  if (sc.inputTranscription && sc.inputTranscription.text) { userSpeechEndAt = Date.now(); latMeasuredThisTurn = false; appendMe(sc.inputTranscription.text); }
   if (sc.modelTurn && sc.modelTurn.parts) {
     flushUser();
-    sc.modelTurn.parts.forEach(p => { if (p.inlineData && p.inlineData.data) playPcm(p.inlineData.data); });
+    sc.modelTurn.parts.forEach(p => { if (p.inlineData && p.inlineData.data) { playPcm(p.inlineData.data); measureLatency(); } });
   }
   if (sc.outputTranscription && sc.outputTranscription.text) appendAi(sc.outputTranscription.text);
   if (sc.turnComplete) endTurn();
@@ -1032,7 +1176,7 @@ function startBrowser(){
 }
 function switchToBrowser(){
   ws = null; stopMic(); usingKind = "browser"; browserBusy = false;
-  showNotice(tx("Live ভয়েসের সীমা শেষ। Chrome ভয়েসে চলে গেছি।", "Live-Stimmen-Limit erreicht. Zur Chrome-Stimme gewechselt."));
+  showNotice(tx("Live ভয়েসের সীমা শেষ। Chrome ভয়েসে চলে গেছি (সাধারণত ৩–৮ সেকেন্ড লাগে)।", "Live-Stimmen-Limit erreicht. Zur Chrome-Stimme gewechselt (dauert meist 3–8 s)."));
   startBrowser();
 }
 function pickVoice(){
@@ -1060,6 +1204,7 @@ function browserTurn(sentence){
   if (curSession) curSession.items.push(item);
   const contents = browserHist.map(h => ({role:h.role, parts:[{text:h.text}]})).concat([{role:"user", parts:[{text:sentence}]}]);
   setStatus(tx("ভাবছে…", "Denkt nach…"));
+  const t0 = Date.now();
   const p = (async () => {
     let reply = "";
     try {
@@ -1079,7 +1224,7 @@ function browserTurn(sentence){
     return reply;
   })();
   pendingChecks.push(p);
-  p.then(reply => { if (!active) return; if (reply) speakReply(reply); else resumeListening(); });
+  p.then(reply => { if (!active) return; if (reply) { lastLatency = (Date.now() - t0) / 1000; showLatency(); speakReply(reply); } else resumeListening(); });
 }
 if (window.speechSynthesis) { try { speechSynthesis.getVoices(); } catch(e){} }
 
@@ -1161,6 +1306,7 @@ async function audioOpen(){
 }
 function audioTurn(b64){
   audBusy = true; setMicLabel(); setStatus(tx("শুনছে…", "Hört zu…"));
+  const t0 = Date.now();
   $("coachEmpty") && $("coachEmpty").remove();
   const sess = curSession, last = (browserHist.filter(h => h.role === "model").pop() || {}).text || "";
   const aud = {inlineData:{mimeType:"audio/wav", data:b64}};
@@ -1195,18 +1341,20 @@ function audioTurn(b64){
     } catch (err) { me.querySelector(".txt").textContent = "—"; setStatus(t("failed") + " (" + err.message + ")", true); }
     ai.classList.remove("live"); ai.querySelector(".txt").textContent = reply || tx("উত্তর পাওয়া যায়নি।", "Keine Antwort.");
     scrollDown($("convFeed"));
+    if (reply) { lastLatency = (Date.now() - t0) / 1000; showLatency(); }
     audBusy = false; if (!active) return; setMicLabel(); if (reply) speakAudio(reply);
   })();
 }
 function switchToAudio(){
   const old = ws; ws = null; try { old && old.close(); } catch(e){}
   usingKind = "audio"; audBusy = false; audRec = false; setupDone = false;
-  showNotice(tx("Live ভয়েসের সীমা শেষ। রেকর্ড মোডে চলে গেছি।", "Live-Stimmen-Limit erreicht. In den Aufnahmemodus gewechselt."));
+  showNotice(tx("Live ভয়েসের সীমা শেষ। রেকর্ড মোডে চলে গেছি (সাধারণত ৩–৮ সেকেন্ড লাগে)।", "Live-Stimmen-Limit erreicht. In den Aufnahmemodus gewechselt (dauert meist 3–8 s)."));
   $("micBtn").setAttribute("aria-pressed","false"); setMicLabel(); audioOpen();
 }
 
 /* ---------- session control ---------- */
 function setMicLabel(){
+  const lc = $("lessonClose"); if (lc) lc.classList.toggle("dim", !active);
   const aud = active && usingKind === "audio";
   $("endBtn").hidden = !aud;
   $("stopRecBtn").hidden = !(aud && audRec);
@@ -1218,7 +1366,7 @@ function tick(){
   $("timer").textContent = String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0");
 }
 async function startSession(){
-  if (!cfg.apiKey) { setStatus(t("nokey"), true); $("settings").open = true; $("apiKey").focus(); return; }
+  if (!cfg.apiKey) { setStatus(t("nokey"), true); openSettingsSheet(); $("apiKey").focus(); return; }
   showNotice(""); setStatus(t("connecting"));
   const kind = cfg.modelKind;
   if (kind !== "browser") { try { await startMic(); } catch(e){ setStatus(t("nomic"), true); return; } }
@@ -1230,7 +1378,7 @@ async function startSession(){
   hist.sessions.push(curSession);
   $("micBtn").setAttribute("aria-pressed", String(kind !== "audio")); setMicLabel();
   startedAt = Date.now(); tick(); timerId = setInterval(tick, 1000);
-  $("settings").open = false;
+  closeSettingsSheet();
   if (kind === "browser") startBrowser(); else if (kind === "audio") audioOpen(); else openSocket();
 }
 /* ---------- auto-backup to Cloudflare after each session ---------- */
@@ -1258,7 +1406,7 @@ function stopSession(){
   if (!sess.items.length) { hist.sessions = hist.sessions.filter(s => s !== sess); saveHist(); return; }
   saveHist();
   if (sess.items.length >= 3) makeReport(sess);
-  uploadBackup();
+  uploadBackup(); fbPushSoon();
 }
 $("micBtn").addEventListener("click", () => {
   if (!active) startSession();
@@ -1270,12 +1418,14 @@ $("stopRecBtn").addEventListener("click", audStop);
 
 /* ---------- progress view ---------- */
 function showView(name){
-  const prog = name === "progress";
-  $("viewPractice").hidden = prog; $("viewProgress").hidden = !prog;
-  $("viewPractice").style.display = prog ? "none" : "flex";
-  $("mPractice").classList.toggle("active", !prog);
-  $("mProgress").classList.toggle("active", prog);
-  if (prog) renderProgress();
+  const views = {practice:"viewPractice", progress:"viewProgress", memory:"viewMemory"};
+  Object.keys(views).forEach(k => { const el = $(views[k]); if (!el) return; const on = k === name; el.hidden = !on; el.style.display = on ? "flex" : "none"; });
+  $("mPractice").classList.toggle("active", name === "practice");
+  $("mProgress").classList.toggle("active", name === "progress");
+  const mm = $("mMemory"); if (mm) mm.classList.toggle("active", name === "memory");
+  document.querySelectorAll(".tabbtn").forEach(b => b.classList.toggle("on", b.dataset.view === name));
+  if (name === "progress") { renderProgress(); fbPushSoon(); }
+  if (name === "memory") renderMemory();
 }
 /* ---------- hamburger menu ---------- */
 function closeMenu(){ $("menu").hidden = true; $("menuBtn").setAttribute("aria-expanded", "false"); }
@@ -1287,11 +1437,7 @@ $("menuBtn").addEventListener("click", (e) => {
 document.addEventListener("click", (e) => { if (!$("menu").hidden && !$("menu").contains(e.target)) closeMenu(); });
 $("mPractice").addEventListener("click", () => { showView("practice"); closeMenu(); });
 $("mProgress").addEventListener("click", () => { showView("progress"); closeMenu(); });
-$("mSettings").addEventListener("click", () => {
-  showView("practice"); closeMenu();
-  const s = $("settings"); s.open = true;
-  setTimeout(() => s.scrollIntoView({behavior:"smooth", block:"start"}), 50);
-});
+$("mSettings").addEventListener("click", () => { closeMenu(); openSettingsSheet(); });
 
 function renderOverview(){
   const body = $("subBody");
@@ -1305,6 +1451,22 @@ function renderOverview(){
   const withBand = sessions.filter(s => s.summary && typeof s.summary.overall === "number");
   const lastBand = withBand.length ? withBand[withBand.length-1].summary.overall : null;
   let h = '';
+  /* Duolingo-style streak header + daily goal + 30-day calendar */
+  const goalN = Number(cfg.goal) || 15;
+  const siH = streakInfo();
+  const xpTotal = a.sentences * 10;
+  const gDays = groupByDay();
+  let calHtml = '';
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const k = dayKey(d.getTime());
+    const n = (gDays[k] || []).length;
+    const cls = n >= goalN ? 'day done' : (n > 0 ? 'day part' : 'day');
+    calHtml += '<span class="' + cls + '">' + d.getDate() + '</span>';
+  }
+  h += '<section><div class="streak-head"><span class="fl">🔥</span><span><span class="num">' + siH.streak + '</span> <span class="lbl">' + esc(tx("দিনের ধারা", "Tage-Serie")) + '</span><div class="best">' + esc(tx("সেরা ধারা: ", "Beste Serie: ")) + bestStreak() + esc(tx(" দিন", " Tage")) + '</div></span><span class="xp"><span class="n">' + xpTotal + '</span><div class="l">XP</div></span></div></section>';
+  h += '<section><h3>' + esc(tx("আজকের লক্ষ্য", "Tagesziel")) + ' · ' + siH.today + '/' + goalN + '</h3><div class="pbar"><div class="pfill" style="width:' + Math.min(100, Math.round(siH.today / goalN * 100)) + '%"></div></div><p class="hint" style="margin:0">' + esc(tx("একদিন মিস করলে ধারা ০ হয়ে যায়।", "Ein verpasster Tag setzt die Serie auf 0 zurück.")) + '</p></section>';
+  h += '<section><h3>' + esc(tx("গত ৩০ দিন", "Letzte 30 Tage")) + '</h3><div class="cal">' + calHtml + '</div></section>';
 
   h += '<section><div class="tiles">' +
     '<div class="band"><b>' + a.sessions + '</b><span>' + esc(tx("সেশন", "Sitzungen")) + '</span></div>' +
@@ -1358,8 +1520,18 @@ function renderOverview(){
   });
   h += '</section>';
 
+  h += '<section><h3>' + esc(tx("আমার অগ্রগতি নিয়ে জিজ্ঞেস করুন", "Frag mich zu deinem Fortschritt")) + '</h3>' +
+    '<p class="hint" style="margin:0">' + esc(tx("যেমন: “আমার দুর্বলতা কী?” — শুধু এই প্রশ্নের উত্তর দিতেই আপনার অগ্রগতির তথ্য Gemini-কে পাঠানো হয়।", "Zum Beispiel: „Was ist meine Schwäche?“ — Deine Fortschrittsdaten werden nur zur Beantwortung dieser Frage an Gemini geschickt.")) + '</p>' +
+    '<div class="chat-feed">' + progChat.map(m => '<div class="msg ' + (m.role === "user" ? "me" : "ai") + '"><span class="txt">' + esc(m.text) + '</span></div>').join("") + '</div>' +
+    '<div class="composer"><input id="progChatInput" inputmode="text" enterkeyhint="send" placeholder="' + esc(tx("প্রশ্ন লিখুন…", "Frage schreiben…")) + '" autocomplete="off"><button class="btn primary" id="progChatSend" type="button">' + esc(tx("পাঠান", "Senden")) + '</button></div></section>';
   body.innerHTML = h;
   const pb = $("planBtn"); if (pb) pb.addEventListener("click", makePlan);
+  const pcs = $("progChatSend"), pci = $("progChatInput");
+  if (pcs && pci) {
+    const sendQ = () => { const q = pci.value.trim(); if (!q) return; pci.value = ""; askProgress(q); };
+    pcs.addEventListener("click", sendQ);
+    pci.addEventListener("keydown", e => { if (e.key === "Enter") sendQ(); });
+  }
 }
 
 async function makePlan(){
@@ -1406,7 +1578,7 @@ function renderGoal(){
     '<div class="btrack"><div class="bfill ok" style="width:' + pct + '%"></div></div>' +
     '<span>' + (si.streak ? esc(si.streak + tx(" দিনের ধারা", "-Tage-Serie")) : esc(tx("আজ শুরু করুন", "Heute anfangen"))) + '</span>';
 }
-$("goal").addEventListener("change", renderGoal);
+/* goal changes apply on Save — see saveSettings */
 
 function dayData(items){
   const gm = {}, wd = {}, up = {};
@@ -1586,8 +1758,351 @@ $("clearBtn").addEventListener("click", () => {
   }
 });
 
+
+/* ============================================================================
+   MOBILE-WEB ADDITIONS (Duolingo shell + Firebase + latency + Memory)
+   ============================================================================ */
+
+/* ---------- Firebase bridge stub (replaced by the module script when it loads) ---------- */
+window.FirebaseSync = window.FirebaseSync || {ready:false, configured:false, user:null,
+  signIn(){ setSyncStatus(tx("Firebase এখনও সেট আপ হয়নি — SETUP-FIREBASE.md দেখুন", "Firebase ist noch nicht eingerichtet — siehe SETUP-FIREBASE.md")); },
+  signOut(){}, push(){}, pullData: async () => null};
+
+function setSyncStatus(msg){
+  document.querySelectorAll(".syncStatus").forEach(el => { el.textContent = msg; });
+}
+function updateAuthUI(){
+  const u = (window.FirebaseSync && window.FirebaseSync.user) || null;
+  const configured = !!(window.FirebaseSync && window.FirebaseSync.configured);
+  document.querySelectorAll(".googleSignInBtn").forEach(b => { b.hidden = !!u; });
+  document.querySelectorAll(".googleSignOutBtn").forEach(b => { b.hidden = !u; });
+  document.querySelectorAll(".authUserLine").forEach(el => {
+    if (u) el.textContent = (u.displayName ? u.displayName + " · " : "") + (u.email || "");
+    else el.textContent = tx("সাইন ইন করা নেই", "Nicht angemeldet");
+  });
+  if (!u && !configured) setSyncStatus(tx("Firebase এখনও সেট আপ হয়নি — SETUP-FIREBASE.md দেখুন", "Firebase ist noch nicht eingerichtet — siehe SETUP-FIREBASE.md"));
+  else if (!u) setSyncStatus(tx("সাইন ইন করলে অগ্রগতি ক্লাউডে সিঙ্ক হবে। এখন শুধু এই ফোনেই থাকছে।", "Nach der Anmeldung wird dein Fortschritt in der Cloud synchronisiert. Jetzt bleibt er nur auf diesem Handy."));
+}
+function bindAuthButtons(root){
+  (root || document).querySelectorAll(".googleSignInBtn").forEach(b => {
+    if (b.dataset.bound) return; b.dataset.bound = "1";
+    b.addEventListener("click", async () => {
+      try { await window.FirebaseSync.signIn(); }
+      catch(e){ setSyncStatus(tx("সাইন ইন হয়নি", "Anmeldung fehlgeschlagen") + " (" + esc(e && e.message ? e.message : String(e)) + ")"); }
+    });
+  });
+  (root || document).querySelectorAll(".googleSignOutBtn").forEach(b => {
+    if (b.dataset.bound) return; b.dataset.bound = "1";
+    b.addEventListener("click", async () => { try { await window.FirebaseSync.signOut(); } catch(e){} });
+  });
+}
+let fbPushTimer = 0;
+function fbPushSoon(){
+  if (!window.FirebaseSync || !window.FirebaseSync.ready || !window.FirebaseSync.user) return;
+  clearTimeout(fbPushTimer);
+  fbPushTimer = setTimeout(() => {
+    try {
+      const p = window.FirebaseSync.push({sessions: hist.sessions, review: rv});
+      if (p && p.then) p.then(() => setSyncStatus(tx("সিঙ্ক হয়েছে", "Synchronisiert"))).catch(() => setSyncStatus(tx("সিঙ্ক হয়নি — পরে আবার চেষ্টা হবে", "Sync fehlgeschlagen — später erneut versuchen")));
+    } catch(e){}
+  }, 800);
+}
+async function fbPullMerge(){
+  if (!window.FirebaseSync || !window.FirebaseSync.pullData) return;
+  try {
+    const remote = await window.FirebaseSync.pullData();
+    if (!remote || !Array.isArray(remote.sessions)) return;
+    const have = new Set(hist.sessions.map(s => s.id)); let added = 0;
+    remote.sessions.forEach(s => { if (s && s.id && Array.isArray(s.items) && !have.has(s.id)) { hist.sessions.push(s); added++; } });
+    if (remote.review && remote.review.cards) Object.keys(remote.review.cards).forEach(k => {
+      const rc = remote.review.cards[k], lc = rv.cards[k];
+      if (!lc) rv.cards[k] = rc;
+      else if ((rc.box || 0) > (lc.box || 0)) rv.cards[k] = rc;
+    });
+    if (added) hist.sessions.sort((x,y) => x.start - y.start);
+    saveHist(); saveRv();
+    if (!$("viewProgress").hidden) renderProgress();
+    if (!$("viewMemory").hidden) renderMemory();
+    setSyncStatus(tx("সিঙ্ক হয়েছে", "Synchronisiert"));
+  } catch(e){ setSyncStatus(tx("সিঙ্ক হয়নি", "Sync fehlgeschlagen")); }
+}
+window.addEventListener("firebase-ready", () => { updateAuthUI(); if (window.FirebaseSync.user) fbPullMerge(); });
+window.addEventListener("firebase-auth", (e) => {
+  updateAuthUI();
+  const u = e.detail && e.detail.user;
+  if (u) { setSyncStatus(tx("সাইন ইন হয়েছে — সিঙ্ক হচ্ছে…", "Angemeldet — synchronisiere…")); fbPullMerge(); }
+  else setSyncStatus(tx("সাইন আউট হয়েছে। অগ্রগতি শুধু এই ফোনেই থাকছে।", "Abgemeldet. Der Fortschritt bleibt nur auf diesem Handy."));
+});
+
+/* ---------- Settings sheet (explicit Save — draft, nothing applies until Save) ---------- */
+function openSettingsSheet(){ fillSettingsFromCfg(); $("settingsSheet").hidden = false; }
+function closeSettingsSheet(confirmDiscard){
+  if (confirmDiscard && settingsDirty) {
+    if (!window.confirm(tx("সেভ না করে বের হবেন? পরিবর্তনগুলো মুছে যাবে।", "Ohne Speichern schließen? Änderungen gehen verloren."))) return;
+  }
+  fillSettingsFromCfg();
+  $("settingsSheet").hidden = true;
+}
+
+/* ---------- latency: measured end-of-speech → first audible reply ---------- */
+let userSpeechEndAt = 0, latMeasuredThisTurn = false, lastLatency = 0;
+function measureLatency(){
+  if (!userSpeechEndAt || latMeasuredThisTurn) return;
+  latMeasuredThisTurn = true;
+  lastLatency = (Date.now() - userSpeechEndAt) / 1000;
+  showLatency();
+}
+function showLatency(){
+  const el = $("latency");
+  if (el && lastLatency > 0) { el.hidden = false; el.textContent = "≈" + lastLatency.toFixed(1) + "s"; }
+  const st = $("status");
+  if (st && st.textContent === t("live")) st.textContent = t("live") + " · ≈" + lastLatency.toFixed(1) + "s";
+}
+
+/* ---------- best streak (longest run of goal-complete days) ---------- */
+function bestStreak(){
+  const g = groupByDay(); const goal = Number(cfg.goal) || 15;
+  const keys = Object.keys(g).sort();
+  let best = 0, run = 0, prev = null;
+  keys.forEach(k => {
+    if ((g[k] || []).length < goal) { run = 0; prev = null; return; }
+    const d = new Date(k + "T00:00:00");
+    if (prev) { const next = new Date(prev); next.setDate(next.getDate() + 1); run = (d.getTime() === next.getTime()) ? run + 1 : 1; }
+    else run = 1;
+    prev = d; best = Math.max(best, run);
+  });
+  return best;
+}
+
+/* ---------- Ask about my progress (Goal tab chat) ---------- */
+let progChat = [];
+function progressSummaryText(){
+  const sessions = hist.sessions.filter(s => s.items && s.items.some(i => i.r));
+  const a = aggregate(sessions);
+  const cats = Object.entries(a.cats).sort((x,y) => y[1]-x[1]).slice(0,5).map(([c,n]) => catLabel(c) + ": " + n).join("; ");
+  const rec = Object.values(a.rec).sort((x,y) => y.n - x.n).slice(0,5).map(r => r.wrong + " -> " + r.right + " (x" + r.n + ")").join("; ");
+  const bands = sessions.filter(s => s.summary).slice(-5).map(s => s.summary.overall).join(", ");
+  return "Sessions: " + a.sessions + ". Sentences: " + a.sentences + ". Error-free: " + a.correct + ". Streak: " + streakInfo().streak + " days. Today: " + streakInfo().today + "/" + (Number(cfg.goal)||15) + ". Error categories: " + (cats || "none") + ". Repeated mistakes: " + (rec || "none") + ". Recent A1 estimates: " + (bands || "none") + ".";
+}
+async function askProgress(q){
+  progChat.push({role:"user", text:q});
+  renderProgress();
+  const sys = "You are a kind German coach for a Bengali-speaking A1 learner. Answer ONLY from the progress summary below, in the learner's interface language (Bengali if they asked in Bengali, German if they asked in German). Keep it short: 2-4 sentences, name the one biggest weakness with one concrete fix. Do not invent data that is not in the summary.";
+  try {
+    const ans = (await callGemini(sys, "Progress summary: " + progressSummaryText() + "\n\nQuestion: " + q, null, 0.4)).trim();
+    progChat.push({role:"ai", text:ans || tx("উত্তর পাওয়া যায়নি।", "Keine Antwort.")});
+  } catch(err) {
+    progChat.push({role:"ai", text: tx("উত্তর পাওয়া যায়নি", "Keine Antwort") + " (" + err.message + ")"});
+  }
+  if (progChat.length > 40) progChat = progChat.slice(-40);
+  renderProgress();
+}
+
+/* ---------- Memory view ---------- */
+function improvementRows(){
+  const sessions = hist.sessions.filter(s => s.items && s.items.some(i => i.r));
+  if (sessions.length < 4) return [];
+  const half = Math.ceil(sessions.length / 2);
+  const oldA = aggregate(sessions.slice(0, half)), newA = aggregate(sessions.slice(half));
+  const rows = [];
+  CAT_IDS.forEach(c => {
+    const o = oldA.cats[c] || 0, n = newA.cats[c] || 0;
+    if (o >= 2 && n < o) rows.push({cat:c, from:o, to:n});
+  });
+  return rows;
+}
+function memorySummaryText(){
+  const sessions = hist.sessions.filter(s => s.items && s.items.some(i => i.r));
+  const a = aggregate(sessions);
+  const acc = a.sentences ? Math.round(a.correct / a.sentences * 100) : 0;
+  const si = streakInfo();
+  const cats = Object.entries(a.cats).sort((x,y) => y[1]-x[1]).slice(0,3).map(([c,n]) => catLabel(c) + " ×" + n).join(", ");
+  const rec = Object.values(a.rec).sort((x,y) => y.n - x.n).slice(0,3).map(r => r.wrong + " → " + r.right).join("; ");
+  const voc = Object.values(a.vocab).sort((x,y) => y.at - x.at).slice(0,5).map(v => v.basic + " → " + v.better).join(", ");
+  return ["Sprich & Fix — " + tx("আমার অগ্রগতি", "Mein Fortschritt"),
+    tx("সেশন", "Sitzungen") + ": " + a.sessions + " · " + tx("বাক্য", "Sätze") + ": " + a.sentences + " · " + tx("ভুলহীন", "Fehlerfrei") + ": " + acc + "% · " + tx("ধারা", "Serie") + ": " + si.streak + " " + tx("দিন", "Tage"),
+    tx("দুর্বল দিক", "Schwachstellen") + ": " + (cats || "—"),
+    tx("বারবার ভুল", "Wiederholte Fehler") + ": " + (rec || "—"),
+    tx("ভালো শব্দ", "Bessere Wörter") + ": " + (voc || "—")].join("\n");
+}
+function setMemNote(m){ const el = $("memNote"); if (el) el.textContent = m || ""; }
+async function shareMemory(){
+  const text = memorySummaryText();
+  if (navigator.share) {
+    try { await navigator.share({title:"Sprich & Fix", text}); return; }
+    catch(e){ if (e && e.name === "AbortError") return; }
+  }
+  try { await navigator.clipboard.writeText(text); setMemNote(tx("কপি হয়েছে — Muse-কে পেস্ট করুন", "Kopiert — in Muse einfügen")); }
+  catch(e){ setMemNote(tx("শেয়ার হয়নি", "Teilen fehlgeschlagen")); }
+}
+function renderMemory(){
+  const body = $("memoryBody"); if (!body) return;
+  const sessions = hist.sessions.filter(s => s.items && s.items.some(i => i.r));
+  const a = aggregate(sessions);
+  const acc = a.sentences ? Math.round(a.correct / a.sentences * 100) : 0;
+  const si = streakInfo();
+  const voc = Object.values(a.vocab).sort((x,y) => y.at - x.at).slice(0, 10);
+  const rec = Object.values(a.rec).sort((x,y) => y.n - x.n).slice(0, 5);
+  const weak = Object.entries(a.cats).sort((x,y) => y[1]-x[1]).slice(0, 3);
+  const imp = improvementRows();
+  let h = '';
+  h += '<div class="auth-card"><div class="who-line authUserLine">' + esc(tx("সাইন ইন করা নেই", "Nicht angemeldet")) + '</div><div class="row"><button class="btn primary googleSignInBtn" type="button">' + esc(tx("Google দিয়ে সাইন ইন করুন", "Mit Google anmelden")) + '</button><button class="btn googleSignOutBtn" type="button" hidden>' + esc(tx("সাইন আউট", "Abmelden")) + '</button></div><div class="sync-line syncStatus"></div></div>';
+  h += '<div class="mem-card"><h3>' + esc(tx("যা শিখেছি", "Was ich gelernt habe")) + '</h3>' +
+    '<div class="mem-row"><span class="a">' + esc(tx("সেশন", "Sitzungen")) + '</span><span class="b">' + a.sessions + '</span></div>' +
+    '<div class="mem-row"><span class="a">' + esc(tx("বাক্য", "Sätze")) + '</span><span class="b">' + a.sentences + '</span></div>' +
+    '<div class="mem-row"><span class="a">' + esc(tx("ভুলহীন বাক্য", "Fehlerfrei")) + '</span><span class="b">' + acc + '%</span></div>' +
+    '<div class="mem-row"><span class="a">' + esc(tx("দিনের ধারা", "Tage-Serie")) + '</span><span class="b">🔥 ' + si.streak + '</span></div>' +
+    (voc.length ? '<div class="mem-row"><span class="a">A1 ' + esc(tx("শব্দভান্ডার", "Wortschatz")) + '</span></div><div class="chips">' + voc.map(v => '<span class="chip">' + esc(v.basic) + ' → <b>' + esc(v.better) + '</b></span>').join("") + '</div>' : '') + '</div>';
+  h += '<div class="mem-card"><h3>' + esc(tx("ভুলগুলো", "Meine Fehler")) + '</h3>' +
+    (rec.length ? rec.map(r => '<div class="rec"><s>' + esc(r.wrong) + '</s> → <em>' + esc(r.right) + '</em><span class="chip">×' + r.n + '</span></div>').join("") : '<p class="mem-note">' + esc(tx("এখনও কোনো ভুল জমেনি।", "Noch keine Fehler.")) + '</p>') +
+    (weak.length ? '<div class="mem-row"><span class="a">' + esc(tx("দুর্বল দিক", "Schwachstellen")) + '</span></div>' + weak.map(([c,n]) => '<div class="mem-row"><span class="a">' + esc(catLabel(c)) + '</span><span class="b" style="color:var(--bad)">×' + n + '</span></div>').join("") : '') + '</div>';
+  h += '<div class="mem-card"><h3>' + esc(tx("কীভাবে এগোচ্ছি", "Wie ich vorankomme")) + '</h3>' +
+    (imp.length ? imp.map(r => '<div class="mem-row"><span class="a">✓ ' + esc(catLabel(r.cat)) + '</span><span class="b" style="color:var(--good)">' + r.from + ' → ' + r.to + '</span></div>').join("") :
+      (si.streak >= 3 ? '<div class="mem-row"><span class="a">🔥 ' + esc(tx("ধারা", "Serie")) + '</span><span class="b" style="color:var(--good)">' + si.streak + ' ' + esc(tx("দিন", "Tage")) + '</span></div>' :
+      '<p class="mem-note">' + esc(tx("এখনও উন্নতির তথ্য নেই — কয়েকটা সেশন শেষ করলেই এখানে দেখাবে।", "Noch keine Fortschrittsdaten — nach ein paar Sitzungen erscheint hier etwas.")) + '</p>')) + '</div>';
+  h += '<button class="btn blue big" id="shareMemoryBtn" type="button">↗ ' + esc(tx("Muse-কে শেয়ার করুন", "Mit Muse teilen")) + '</button>';
+  h += '<p class="mem-note" id="memNote"></p>';
+  h += '<p class="mem-note">' + esc(tx("এই মেমরি শুধু এই ফোনেই থাকে। সাইন ইন করলে ক্লাউডেও সিঙ্ক হয়। Muse-কে অটো পাঠানো হয় না — শেয়ার বোতাম চাপলেই যাবে।", "Dieses Gedächtnis bleibt nur auf diesem Handy. Nach der Anmeldung wird es auch in der Cloud synchronisiert. Es wird nichts automatisch an Muse geschickt — nur wenn du auf Teilen tippst.")) + '</p>';
+  body.innerHTML = h;
+  updateAuthUI();
+  const sh = $("shareMemoryBtn"); if (sh) sh.addEventListener("click", shareMemory);
+  bindAuthButtons(body);
+}
+
+/* ---------- lesson chrome: keep flame + progress in sync with the goal ---------- */
+const _origRenderGoal = renderGoal;
+renderGoal = function(){
+  _origRenderGoal();
+  const si = streakInfo(); const goal = Number(cfg.goal) || 15;
+  const f = $("lessonFill"); if (f) f.style.width = Math.min(100, Math.round(si.today / goal * 100)) + "%";
+  const fl = $("lessonFlame"); if (fl) fl.textContent = "🔥 " + si.streak;
+  const lc = $("lessonClose"); if (lc) lc.classList.toggle("dim", !active);
+};
+
+/* ---------- wire up the new shell ---------- */
+fillSettingsFromCfg();
+bindAuthButtons(document);
+document.querySelectorAll(".tabbtn").forEach(b => b.addEventListener("click", () => showView(b.dataset.view)));
+$("mMemory").addEventListener("click", () => { showView("memory"); closeMenu(); });
+$("lessonClose").addEventListener("click", () => {
+  if (active) { stopSession(); setStatus(""); }
+  else setStatus(tx("কোনো সেশন চলছে না — কথা শুরু চাপুন।", "Keine Sitzung läuft — tippe auf „Sprechen starten“."));
+});
+$("saveSettingsBtn").addEventListener("click", saveSettings);
+$("settingsClose").addEventListener("click", () => closeSettingsSheet(true));
+$("exportBtn2").addEventListener("click", () => $("exportBtn").click());
+$("importBtn2").addEventListener("click", () => $("importFile").click());
+(function(){
+  try {
+    const dismissed = localStorage.getItem("sprichfix_install_dismissed") === "1";
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const standalone = window.navigator.standalone === true || (window.matchMedia && matchMedia("(display-mode: standalone)").matches);
+    if (isIOS && !standalone && !dismissed) $("installBanner").hidden = false;
+  } catch(e){}
+})();
+$("installDismiss").addEventListener("click", () => { $("installBanner").hidden = true; try { localStorage.setItem("sprichfix_install_dismissed", "1"); } catch(e){} });
+
 applyLang();
 </script>
+<script type="module">
+/* ============================================================================
+   FIREBASE — Google sign-in + Firestore cloud sync (one project, many users)
+   ----------------------------------------------------------------------------
+   PASTE YOUR PROJECT'S WEB CONFIG BELOW (placeholders only — no real keys here).
+   Firebase console → your project → Project settings (gear) → "Your apps" →
+   Web app (</>) → copy the firebaseConfig object and paste its values here.
+   One project (Omar's) serves every user of this app. Each user signs in
+   with their own Google account and sees ONLY their own data (enforced by
+   firestore.rules: request.auth.uid == userId). Never paste anyone else's
+   config here, and never put a Gemini key in this file — the Gemini key lives
+   per-browser in Settings only.
+   If the placeholders below are left as-is, the app still works fully on
+   local storage; sign-in simply shows "Firebase not set up yet".
+   ============================================================================ */
+const FIREBASE_CONFIG = {
+  apiKey: "PASTE_YOUR_API_KEY",
+  authDomain: "PASTE_YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "PASTE_YOUR_PROJECT_ID",
+  storageBucket: "PASTE_YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "PASTE_YOUR_SENDER_ID",
+  appId: "PASTE_YOUR_APP_ID"
+};
+const FIREBASE_CONFIGURED = FIREBASE_CONFIG.apiKey && !String(FIREBASE_CONFIG.apiKey).startsWith("PASTE_");
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, setPersistence, browserLocalPersistence, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+function fbReady(){
+  try { window.dispatchEvent(new Event("firebase-ready")); } catch(e){}
+}
+function fbAuth(user){
+  try { window.dispatchEvent(new CustomEvent("firebase-auth", {detail:{user: user ? {uid:user.uid, email:user.email || "", displayName:user.displayName || ""} : null}})); } catch(e){}
+}
+
+if (!FIREBASE_CONFIGURED) {
+  /* No config yet: local-only mode. The classic script's stub stays in place. */
+  fbReady();
+} else {
+  let app = null, auth = null, db = null;
+  try {
+    app = initializeApp(FIREBASE_CONFIG);
+    auth = getAuth(app);
+    db = getFirestore(app);
+    /* Persistent sign-in: stays signed in across app closes and phone restarts.
+       Only the explicit "Sign out" button or clearing Safari website data signs out. */
+    setPersistence(auth, browserLocalPersistence).catch(() => {});
+    getRedirectResult(auth).catch(() => {});
+    onAuthStateChanged(auth, (user) => {
+      if (window.FirebaseSync) window.FirebaseSync.user = user ? {uid:user.uid, email:user.email || "", displayName:user.displayName || ""} : null;
+      fbAuth(user);
+    });
+    window.FirebaseSync = {
+      ready: true,
+      configured: true,
+      user: null,
+      async signIn(){
+        const provider = new GoogleAuthProvider();
+        const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        const standalone = window.navigator.standalone === true || (window.matchMedia && matchMedia("(display-mode: standalone)").matches);
+        /* Popups are blocked in iOS Safari / standalone PWA — use redirect there. */
+        if (isIOS || standalone) { await signInWithRedirect(auth, provider); return; }
+        try { await signInWithPopup(auth, provider); }
+        catch (e) {
+          if (e && (e.code === "auth/popup-blocked" || e.code === "auth/popup-closed-by-user" || e.code === "auth/cancelled-popup-request")) {
+            await signInWithRedirect(auth, provider);
+          } else { throw e; }
+        }
+      },
+      async signOut(){ await signOut(auth); },
+      async push(data){
+        const u = auth.currentUser;
+        if (!u || !data) return false;
+        let sessions = Array.isArray(data.sessions) ? data.sessions.slice() : [];
+        let payload = JSON.stringify({sessions, review: data.review || {cards:{}}});
+        /* Firestore documents cap at 1 MB — keep the newest 100 sessions if too big. */
+        if (payload.length > 900000) {
+          sessions = sessions.slice(-100);
+          payload = JSON.stringify({sessions, review: data.review || {cards:{}}});
+        }
+        await setDoc(doc(db, "users", u.uid), {sessions, review: data.review || {cards:{}}, updatedAt: serverTimestamp()}, {merge:true});
+        return true;
+      },
+      async pullData(){
+        const u = auth.currentUser;
+        if (!u) return null;
+        const snap = await getDoc(doc(db, "users", u.uid));
+        return snap.exists() ? snap.data() : null;
+      }
+    };
+    fbReady();
+  } catch (e) {
+    /* Firebase failed to start (bad config, no network): stay local-only. */
+    fbReady();
+  }
+}
+</script>
+
 <script>
 if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol) && location.hostname !== "localhost") {
   window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });

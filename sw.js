@@ -1,6 +1,8 @@
-const CACHE = "sprich-fix-v1";
-const BASE = "/speak-and-fix-deutsch/";
-const ASSETS = [BASE, BASE + "index.html", BASE + "manifest.webmanifest", BASE + "icon-192.png", BASE + "icon-512.png"];
+/* Sprich & Fix (mobile web) — service worker.
+   Cache name MUST be bumped (v1 -> v2 -> v3 ...) every time index.html changes,
+   otherwise phones keep showing the old version. */
+const CACHE = "sprich-fix-mobile-v1";
+const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(
@@ -17,8 +19,12 @@ self.addEventListener("activate", e => {
 });
 
 self.addEventListener("fetch", e => {
-  const url = e.request.url;
-  if (e.request.method !== "GET" || !url.startsWith(self.location.origin + BASE)) return;
+  if (e.request.method !== "GET") return;
+  const url = new URL(e.request.url);
+  /* Only handle same-origin requests inside this app's folder (the shell + icons).
+     Gemini / Firebase / Google Fonts requests always go to the network. */
+  if (url.origin !== self.location.origin) return;
+  if (!url.pathname.startsWith(new URL("./", self.location.href).pathname)) return;
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
@@ -26,7 +32,7 @@ self.addEventListener("fetch", e => {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
         return res;
-      }).catch(() => caches.match(BASE + "index.html"));
+      }).catch(() => caches.match("./index.html"));
     })
   );
 });
